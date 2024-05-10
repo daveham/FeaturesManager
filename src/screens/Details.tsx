@@ -7,7 +7,8 @@ import { isSnackbarOpenSelector } from '../state/ui/selectors';
 import { openSnackbar, closeSnackbar } from '../state/ui/actions';
 import { userDataAction } from '../state/user/actions';
 import { userDataSelector } from '../state/user/selectors';
-import { dataRequestMeta } from '../state/utilities';
+import { dataRequestMeta, makeDataRequestMeta } from '../state/utilities';
+import { smugmugTestDataAction } from '../state/api/actions';
 
 export function Details(): React.JSX.Element {
   const dispatch = useDispatch();
@@ -15,7 +16,7 @@ export function Details(): React.JSX.Element {
   const { firstName, lastName } = useSelector(userDataSelector);
   const isSnackbarOpen = useSelector(isSnackbarOpenSelector);
 
-  const handleButtonPress = () => {
+  const handleSnackbarButtonPress = () => {
     if (isSnackbarOpen) {
       dispatch(closeSnackbar());
     } else {
@@ -24,6 +25,10 @@ export function Details(): React.JSX.Element {
         openSnackbar('User name has been requested from Details screen.'),
       );
     }
+  };
+
+  const handleSmugmugButtonPress = () => {
+    dispatch(smugmugTestDataAction({}, makeDataRequestMeta()));
   };
 
   let label;
@@ -38,8 +43,13 @@ export function Details(): React.JSX.Element {
   return (
     <View style={styles.root}>
       <View style={styles.buttonContainer}>
-        <Button mode="contained" onPress={handleButtonPress}>
+        <Button mode="contained" onPress={handleSnackbarButtonPress}>
           {label}
+        </Button>
+      </View>
+      <View style={styles.buttonContainer}>
+        <Button mode="contained" onPress={handleSmugmugButtonPress}>
+          Test SmugMug
         </Button>
       </View>
     </View>
