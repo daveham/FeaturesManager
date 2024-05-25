@@ -4,3 +4,4 @@
 // variables defined.
 export const SMUGMUG_API_KEY = process.env.SMUGMUG_API_KEY;
 export const SMUGMUG_NICKNAME = process.env.SMUGMUG_NICKNAME;
+export const SMUGMUG_API_KEY_SECRET = process.env.SMUGMUG_API_KEY_SECRET;

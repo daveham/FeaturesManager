@@ -8,9 +8,8 @@ const INITIAL_STATE = {};
 
 export const userData = handleActions(
   {
-    [userDataAction]: (state, action) => {
-      return isDataResponseAction(action) ? action.payload : state;
-    },
+    [userDataAction]: (state, action) =>
+      isDataResponseAction(action) ? action.payload : state,
   },
   INITIAL_STATE,
 );

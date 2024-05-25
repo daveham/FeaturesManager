@@ -1,4 +1,4 @@
-import { all, call, put, takeEvery } from 'redux-saga/effects';
+import { all, call, put, select, takeEvery } from 'redux-saga/effects';
 import axios from 'axios';
 
 import { isDataRequestAction, makeDataResponseMeta } from '../state/utilities';
@@ -6,8 +6,23 @@ import {
   SMUGMUG_API_KEY,
   SMUGMUG_NICKNAME,
 } from '../shared/constants/env-constants';
+import {
+  convertQueryStringToObject,
+  fastCryptoHash,
+  getDataAsParameterString,
+  Oauth,
+  SMUGMUG_AUTHORIZE_URL,
+  SMUGMUG_REQUEST_TOKEN_URL,
+  sortObjectProperties,
+} from '../shared/oauth';
 
-import { smugmugTestDataAction } from '../state/api/actions';
+import {
+  smugmugRequestTokenAction,
+  smugmugAuthorizationUrlAction,
+  smugmugCredentialsAction,
+  smugmugOauthAction,
+  smugmugTestDataAction,
+} from '../state/api/actions';
 
 export async function makeSmugmugRequest(url, options = {}, headers = {}) {
   const reqOpts = {
@@ -15,7 +30,7 @@ export async function makeSmugmugRequest(url, options = {}, headers = {}) {
       ...headers,
       Accept: 'application/json',
     },
-    url: `${url}?APIKey=${SMUGMUG_API_KEY}`,
+    url,
     ...options,
   };
   return axios(reqOpts).then(
@@ -29,7 +44,6 @@ export async function makeSmugmugRequest(url, options = {}, headers = {}) {
 }
 
 export function getRequest(url, headers) {
-  console.log('getRequest', { url, headers });
   return makeSmugmugRequest(url, { method: 'GET' }, headers);
 }
 export function postRequest(url, data = {}, headers) {
@@ -43,9 +57,8 @@ export function deleteRequest(url, data = {}, headers) {
 }
 
 export function* callApi(fn, args, options = {}) {
-  const { successAction, errorAction } = options;
+  const { successAction, successPayloadTransform, errorAction } = options;
 
-  console.log('callApi', ...args);
   let apiResponse;
   try {
     apiResponse = yield call(fn, ...args);
@@ -59,7 +72,14 @@ export function* callApi(fn, args, options = {}) {
 
   try {
     if (successAction) {
-      yield put(successAction(apiResponse, makeDataResponseMeta()));
+      const data = successPayloadTransform
+        ? successPayloadTransform(apiResponse)
+        : apiResponse;
+      console.log('callApi:transform', {
+        apiResponse,
+        data,
+      });
+      yield put(successAction(data, makeDataResponseMeta()));
     }
   } catch (apiSuccessErr) {
     console.error('caught error dispatching success action', apiSuccessErr);
@@ -67,10 +87,12 @@ export function* callApi(fn, args, options = {}) {
   return true;
 }
 
-export function* smugmugTestApiSaga({ payload }) {
+export function* smugmugTestApiSaga() {
   yield* callApi(
     getRequest,
-    [`https://api.smugmug.com/api/v2/user/${SMUGMUG_NICKNAME}`],
+    [
+      `https://api.smugmug.com/api/v2/user/${SMUGMUG_NICKNAME}?APIKey=${SMUGMUG_API_KEY}`,
+    ],
     {
       successAction: smugmugTestDataAction,
       errorAction: smugmugTestDataAction,
@@ -78,11 +100,75 @@ export function* smugmugTestApiSaga({ payload }) {
   );
 }
 
+export function* smugmugOauthSaga() {
+  yield put(smugmugOauthAction({}, makeDataResponseMeta()));
+}
+
+export function* smugmugGetRequestTokenSaga({
+  payload: { smugmugApiKey, smugmugApiSecret },
+}) {
+  const oauth = new Oauth({
+    consumer: { key: smugmugApiKey, secret: smugmugApiSecret },
+    signature_method: 'HMAC-SHA1',
+    hash_function: fastCryptoHash,
+  });
+
+  const request = {
+    url: SMUGMUG_REQUEST_TOKEN_URL,
+    method: 'POST',
+    data: {
+      oauth_callback: 'oob',
+    },
+  };
+
+  const headers = {
+    Accept: 'application/json',
+    ...oauth.toHeader(oauth.authorize(request), { oauth_callback: 'oob' }),
+  };
+
+  let captureSuccessPayload;
+  let captureSuccessMeta;
+  const apiResult = yield* callApi(
+    postRequest,
+    [request.url, request.data, headers],
+    {
+      successAction: (payload, meta) => {
+        captureSuccessPayload = payload;
+        captureSuccessMeta = meta;
+        return smugmugRequestTokenAction(payload, meta);
+      },
+      successPayloadTransform: convertQueryStringToObject,
+      errorAction: smugmugRequestTokenAction,
+    },
+  );
+
+  if (apiResult && !captureSuccessMeta?.error) {
+    const properties = {
+      oauth_token: encodeURIComponent(captureSuccessPayload.oauth_token),
+      access: 'Full',
+      permissions: 'Modify',
+    };
+    const url = `${SMUGMUG_AUTHORIZE_URL}?${getDataAsParameterString(
+      sortObjectProperties(properties),
+    )}`;
+
+    yield put(smugmugAuthorizationUrlAction(url, makeDataResponseMeta()));
+  }
+}
+
 export default function* rootSaga() {
   yield all([
     takeEvery(
       action => isDataRequestAction(action, smugmugTestDataAction),
       smugmugTestApiSaga,
+    ),
+    takeEvery(
+      action => isDataRequestAction(action, smugmugOauthAction),
+      smugmugOauthSaga,
+    ),
+    takeEvery(
+      action => isDataRequestAction(action, smugmugRequestTokenAction),
+      smugmugGetRequestTokenSaga,
     ),
   ]);
 }

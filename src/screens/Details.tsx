@@ -8,7 +8,10 @@ import { openSnackbar, closeSnackbar } from '../state/ui/actions';
 import { userDataAction } from '../state/user/actions';
 import { userDataSelector } from '../state/user/selectors';
 import { dataRequestMeta, makeDataRequestMeta } from '../state/utilities';
-import { smugmugTestDataAction } from '../state/api/actions';
+import {
+  smugmugOauthAction,
+  smugmugTestDataAction,
+} from '../state/api/actions';
 
 export function Details(): React.JSX.Element {
   const dispatch = useDispatch();
@@ -27,7 +30,11 @@ export function Details(): React.JSX.Element {
     }
   };
 
-  const handleSmugmugButtonPress = () => {
+  const handleSmugmugOAuthTestButtonPress = () => {
+    dispatch(smugmugOauthAction({}, makeDataRequestMeta()));
+  };
+
+  const handleSmugmugPublicTestButtonPress = () => {
     dispatch(smugmugTestDataAction({}, makeDataRequestMeta()));
   };
 
@@ -48,8 +55,13 @@ export function Details(): React.JSX.Element {
         </Button>
       </View>
       <View style={styles.buttonContainer}>
-        <Button mode="contained" onPress={handleSmugmugButtonPress}>
-          Test SmugMug
+        <Button mode="contained" onPress={handleSmugmugPublicTestButtonPress}>
+          Test SmugMug Public Request
+        </Button>
+      </View>
+      <View style={styles.buttonContainer}>
+        <Button mode="contained" onPress={handleSmugmugOAuthTestButtonPress}>
+          Test SmugMug OAuth Request
         </Button>
       </View>
     </View>
