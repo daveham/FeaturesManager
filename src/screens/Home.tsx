@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button, Surface, Text, TextInput } from 'react-native-paper';
-import { StyleSheet, View } from 'react-native';
+import { Linking, StyleSheet, View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
@@ -9,12 +9,18 @@ import { openSnackbar } from '../state/ui/actions';
 import type { HomeScreenProps } from './types.tsx';
 import {
   smugmugAuthorizationUrlAction,
-  smugmugCredentialsAction,
+  smugmugConsumerCredentialsAction,
   smugmugRequestTokenAction,
+  smugmugTestDataAction,
+  smugmugTestRequestAction,
+  smugmugVerificationPinAction,
 } from '../state/api/actions';
 import {
-  smugmugCredentialsSelector,
+  smugmugConsumerCredentialsSelector,
   smugmugRequestTokenSelector,
+  smugmugAuthorizationUrlSelector,
+  smugmugVerificationPinSelector,
+  smugmugAccessTokenSelector,
 } from '../state/api/selectors';
 import { makeDataRequestMeta } from '../state/utilities';
 import {
@@ -22,38 +28,64 @@ import {
   SMUGMUG_API_KEY_SECRET,
 } from '../shared/constants/env-constants';
 
+type smugmugCredentialsFormProps = {
+  smugmugApiKey: string | undefined;
+  smugmugApiSecret: string | undefined;
+};
+
+type smugmugPinFormProps = {
+  smugmugVerifierPin: string | undefined;
+};
+
+const SmugmugCredentialsValidationSchema = Yup.object().shape({
+  smugmugApiKey: Yup.string()
+    .length(32, 'A SmugMug API key is 32 characters long')
+    .required('Key is required'),
+  smugmugApiSecret: Yup.string()
+    .length(64, 'A SmugMug API secret is 64 characters long')
+    .required('Secret is required'),
+});
+
+const SmugmugVerifierValidationSchema = Yup.object().shape({
+  smugmugVerifierPin: Yup.string()
+    .length(6, 'Should be 6 digits')
+    .required('The PIN is required'),
+});
+
+/*
+const DropboxValidationSchema = Yup.object().shape({
+  dropboxUserId: Yup.string()
+    .min(6, 'Enter a valid ID')
+    .required('DropBox ID is required'),
+  dropboxPassword: Yup.string()
+    .min(4, 'Password should be of minimum 8 characters length')
+    .required('Password is required'),
+});
+*/
+
 export function Home({ navigation }: HomeScreenProps): React.JSX.Element {
   const dispatch = useDispatch();
 
   const [showSmugmugKey, setShowSmugmugKey] = React.useState(false);
   const [showSmugmugSecret, setShowSmugmugSecret] = React.useState(false);
 
-  const { key: smugmugApiKey, secret: smugmugApiSecret } = useSelector(
-    smugmugCredentialsSelector,
+  const { smugmugApiKey, smugmugApiSecret } = useSelector(
+    smugmugConsumerCredentialsSelector,
   );
   const { oauth_token, oauth_token_secret, oauth_callback_confirmed } =
     useSelector(smugmugRequestTokenSelector);
-
-  const SmugmugValidationSchema = Yup.object().shape({
-    smugmugApiKey: Yup.string()
-      .length(32, 'A SmugMug API key is 32 characters long')
-      .required('Key is required'),
-    smugmugApiSecret: Yup.string()
-      .length(64, 'A SmugMug API secret is 64 characters long')
-      .required('Secret is required'),
-  });
-
-  const DropboxValidationSchema = Yup.object().shape({
-    dropboxUserId: Yup.string()
-      .min(6, 'Enter a valid ID')
-      .required('DropBox ID is required'),
-    dropboxPassword: Yup.string()
-      .min(4, 'Password should be of minimum 8 characters length')
-      .required('Password is required'),
-  });
+  const authorizationUrl = useSelector(smugmugAuthorizationUrlSelector);
+  const smugmugVerificationPin = useSelector(smugmugVerificationPinSelector);
+  const { access_token, access_token_secret } = useSelector(
+    smugmugAccessTokenSelector,
+  );
 
   const handleDetailsButtonPress = () => {
     navigation.navigate('Details');
+  };
+
+  const handleAuthenticationButtonPress = () => {
+    navigation.navigate('Authentication');
   };
 
   const handleShowSmugmugKeyPress = () => {
@@ -64,19 +96,33 @@ export function Home({ navigation }: HomeScreenProps): React.JSX.Element {
     setShowSmugmugSecret(!showSmugmugSecret);
   };
 
-  const handleRequestTokenPress = () => {
-    dispatch(
-      smugmugRequestTokenAction(
-        { smugmugApiKey, smugmugApiSecret },
-        makeDataRequestMeta(),
-      ),
-    );
+  const handleOpenInBrowserPress = () => {
+    Linking.openURL(authorizationUrl).then(() => {
+      console.log(`opening URL ${authorizationUrl}`);
+    });
   };
 
-  const handleRequestAuthUrlPress = () => {
+  const handleVerifyPress = ({ smugmugVerifierPin }: smugmugPinFormProps) => {
+    console.log('verify press', smugmugVerifierPin);
+    dispatch(smugmugVerificationPinAction(smugmugVerifierPin));
+  };
+
+  const handleOnSubmitCredentialsPress = (
+    credentials: smugmugCredentialsFormProps,
+  ) => {
+    dispatch(smugmugConsumerCredentialsAction(credentials));
+    dispatch(smugmugRequestTokenAction(credentials, makeDataRequestMeta()));
+  };
+
+  const handleTestRequestPress = () => {
     dispatch(
-      smugmugAuthorizationUrlAction(
-        { oauth_token, oauth_token_secret },
+      smugmugTestRequestAction(
+        {
+          smugmugApiKey,
+          smugmugApiSecret,
+          access_token,
+          access_token_secret,
+        },
         makeDataRequestMeta(),
       ),
     );
@@ -90,14 +136,9 @@ export function Home({ navigation }: HomeScreenProps): React.JSX.Element {
             smugmugApiKey: SMUGMUG_API_KEY,
             smugmugApiSecret: SMUGMUG_API_KEY_SECRET,
           }}
-          validationSchema={SmugmugValidationSchema}
-          onSubmit={values => {
-            dispatch(
-              smugmugCredentialsAction({
-                key: values.smugmugApiKey,
-                secret: values.smugmugApiSecret,
-              }),
-            );
+          validationSchema={SmugmugCredentialsValidationSchema}
+          onSubmit={(values: smugmugCredentialsFormProps) => {
+            handleOnSubmitCredentialsPress(values);
             dispatch(openSnackbar(JSON.stringify(values, null, 2)));
           }}>
           {({
@@ -153,7 +194,62 @@ export function Home({ navigation }: HomeScreenProps): React.JSX.Element {
                   disabled={!isValid}
                   mode="contained"
                   onPress={() => handleSubmit()}>
-                  Save Credentials
+                  Submit Credentials
+                </Button>
+              </View>
+            </View>
+          )}
+        </Formik>
+        <View style={styles.loginButtonContainer}>
+          <Text>{authorizationUrl}</Text>
+          <Button
+            disabled={!authorizationUrl}
+            mode="contained"
+            onPress={handleOpenInBrowserPress}>
+            Visit SmugMug for PIN
+          </Button>
+        </View>
+      </Surface>
+
+      <Surface elevation={1} style={styles.form}>
+        <Formik
+          initialValues={{
+            smugmugVerifierPin: '',
+          }}
+          validationSchema={SmugmugVerifierValidationSchema}
+          onSubmit={(values: smugmugPinFormProps) => {
+            handleVerifyPress(values);
+            dispatch(openSnackbar(JSON.stringify(values, null, 2)));
+          }}>
+          {({
+            handleChange,
+            handleBlur,
+            handleSubmit,
+            isValid,
+            errors,
+            touched,
+            values,
+          }) => (
+            <View style={styles.group}>
+              <TextInput
+                label="SmugMug Verification PIN"
+                error={Boolean(
+                  touched.smugmugVerifierPin && errors.smugmugVerifierPin,
+                )}
+                value={values.smugmugVerifierPin}
+                onChangeText={handleChange('smugmugVerifierPin')}
+                onBlur={handleBlur('smugmugVerifierPin')}
+                style={styles.formElement}
+              />
+              {touched.smugmugVerifierPin && errors.smugmugVerifierPin && (
+                <Text variant="labelSmall">{`${errors.smugmugVerifierPin}`}</Text>
+              )}
+              <View style={styles.loginButtonContainer}>
+                <Button
+                  disabled={!isValid}
+                  mode="contained"
+                  onPress={() => handleSubmit()}>
+                  Verify PIN
                 </Button>
               </View>
             </View>
@@ -161,21 +257,41 @@ export function Home({ navigation }: HomeScreenProps): React.JSX.Element {
         </Formik>
         <View style={styles.loginButtonContainer}>
           <Button
-            disabled={!smugmugApiKey || !smugmugApiSecret}
+            disabled={
+              !access_token ||
+              !access_token_secret ||
+              !smugmugApiKey ||
+              !smugmugApiSecret
+            }
             mode="contained"
-            onPress={handleRequestTokenPress}>
-            Request Token
+            onPress={handleTestRequestPress}>
+            SmugMug Test Request
           </Button>
         </View>
+      </Surface>
+
+      <Button mode="contained-tonal" onPress={handleDetailsButtonPress}>
+        See Details
+      </Button>
+      <Button mode="contained-tonal" onPress={handleAuthenticationButtonPress}>
+        Authentication
+      </Button>
+    </View>
+  );
+}
+
+/*
         <View style={styles.loginButtonContainer}>
           <Button
             disabled={!oauth_callback_confirmed}
             mode="contained"
-            onPress={handleRequestAuthUrlPress}>
+            onPress={handleOpenInBrowserPress}>
             Request Auth URL
           </Button>
         </View>
-      </Surface>
+ */
+
+/*
       <Surface elevation={1} style={styles.form}>
         <Formik
           initialValues={{
@@ -233,13 +349,7 @@ export function Home({ navigation }: HomeScreenProps): React.JSX.Element {
           )}
         </Formik>
       </Surface>
-      <Button mode="contained-tonal" onPress={handleDetailsButtonPress}>
-        See Details
-      </Button>
-    </View>
-  );
-}
-
+ */
 const styles = StyleSheet.create({
   root: {
     flex: 1,

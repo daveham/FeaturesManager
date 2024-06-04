@@ -3,23 +3,33 @@ import { createActions } from 'redux-actions';
 import { createActionMapForData } from '../utilities';
 
 const dataActionsMap = createActionMapForData([
-  'SMUGMUG_TEST_DATA',
+  'DROPBOX_TEST_DATA',
+  'SMUGMUG_ACCESS_TOKEN',
+  'SMUGMUG_AUTHORIZATION_URL',
   'SMUGMUG_OAUTH',
   'SMUGMUG_REQUEST_TOKEN',
-  'SMUGMUG_AUTHORIZATION_URL',
-  'DROPBOX_TEST_DATA',
+  'SMUGMUG_TEST_REQUEST',
+  'SMUGMUG_TEST_DATA',
 ]);
 
-const identityActions = ['SMUGMUG_CREDENTIALS_ACTION'];
+const identityActions = [
+  'SMUGMUG_CONSUMER_CREDENTIALS_ACTION',
+  'SMUGMUG_VERIFICATION_PIN_ACTION',
+];
 
 export const {
-  // SmugMug Data Actions
-  smugmugTestDataAction,
-  smugmugOauthAction,
-  smugmugRequestTokenAction,
-  smugmugAuthorizationUrlAction,
   // DropBox Data Actions
   dropboxTestDataAction,
+
+  // SmugMug Data Actions
+  smugmugAccessTokenAction,
+  smugmugAuthorizationUrlAction,
+  smugmugOauthAction,
+  smugmugRequestTokenAction,
+  smugmugTestRequestAction,
+  smugmugTestDataAction,
+
   // SmugMug Identity Actions
-  smugmugCredentialsAction,
+  smugmugConsumerCredentialsAction,
+  smugmugVerificationPinAction,
 } = createActions(dataActionsMap, ...identityActions);

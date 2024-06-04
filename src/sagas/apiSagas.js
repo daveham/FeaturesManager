@@ -11,7 +11,9 @@ import {
   fastCryptoHash,
   getDataAsParameterString,
   Oauth,
+  SMUGMUG_ACCESS_TOKEN_URL,
   SMUGMUG_AUTHORIZE_URL,
+  SMUGMUG_BASE_URL,
   SMUGMUG_REQUEST_TOKEN_URL,
   sortObjectProperties,
 } from '../shared/oauth';
@@ -19,10 +21,17 @@ import {
 import {
   smugmugRequestTokenAction,
   smugmugAuthorizationUrlAction,
-  smugmugCredentialsAction,
+  smugmugConsumerCredentialsAction,
   smugmugOauthAction,
   smugmugTestDataAction,
+  smugmugVerificationPinAction,
+  smugmugAccessTokenAction,
+  smugmugTestRequestAction,
 } from '../state/api/actions';
+import {
+  smugmugConsumerCredentialsSelector,
+  smugmugRequestTokenSelector,
+} from '../state/api/selectors';
 
 export async function makeSmugmugRequest(url, options = {}, headers = {}) {
   const reqOpts = {
@@ -156,6 +165,86 @@ export function* smugmugGetRequestTokenSaga({
   }
 }
 
+export function* smugmugVerifyPinSaga({ payload }) {
+  // at, ats = service.get_access_token(rt, rts, params={'oauth_verifier': verifier})
+
+  const { smugmugApiKey, smugmugApiSecret } = yield select(
+    smugmugConsumerCredentialsSelector,
+  );
+  const { oauth_token, oauth_token_secret } = yield select(
+    smugmugRequestTokenSelector,
+  );
+  console.log('smugmugVerifyPinSaga', {
+    smugmugApiKey,
+    smugmugApiSecret,
+    verifier: payload,
+    oauth_token,
+    oauth_token_secret,
+  });
+
+  const token = { key: oauth_token, secret: oauth_token_secret };
+
+  const oauth = new Oauth({
+    consumer: { key: smugmugApiKey, secret: smugmugApiSecret },
+    signature_method: 'HMAC-SHA1',
+    hash_function: fastCryptoHash,
+  });
+
+  const request = {
+    url: SMUGMUG_ACCESS_TOKEN_URL,
+    method: 'GET',
+    data: {
+      oauth_verifier: payload,
+    },
+  };
+
+  const headers = {
+    Accept: 'application/json',
+    ...oauth.toHeader(oauth.authorize(request, token), {
+      oauth_verifier: payload,
+    }),
+  };
+
+  const apiResult = yield* callApi(getRequest, [request.url, headers], {
+    successAction: smugmugAccessTokenAction,
+    successPayloadTransform: convertQueryStringToObject,
+    errorAction: smugmugAccessTokenAction,
+  });
+  console.log('smugmugVerifyPinSaga', { apiResult });
+}
+
+export function* smugmugTestRequestSaga({
+  payload: {
+    smugmugApiKey,
+    smugmugApiSecret,
+    access_token,
+    access_token_secret,
+  },
+}) {
+  const token = { key: access_token, secret: access_token_secret };
+
+  const oauth = new Oauth({
+    consumer: { key: smugmugApiKey, secret: smugmugApiSecret },
+    signature_method: 'HMAC-SHA1',
+    hash_function: fastCryptoHash,
+  });
+
+  const request = {
+    url: `${SMUGMUG_BASE_URL}!authuser`,
+    method: 'GET',
+  };
+
+  const headers = oauth.toHeader(oauth.authorize(request, token), {
+    Accept: 'application/json',
+  });
+
+  const apiResult = yield* callApi(getRequest, [request.url, headers], {
+    successAction: smugmugTestRequestAction,
+    errorAction: smugmugTestRequestAction,
+  });
+  console.log('smugmugTestRequestSaga', { apiResult });
+}
+
 export default function* rootSaga() {
   yield all([
     takeEvery(
@@ -169,6 +258,11 @@ export default function* rootSaga() {
     takeEvery(
       action => isDataRequestAction(action, smugmugRequestTokenAction),
       smugmugGetRequestTokenSaga,
+    ),
+    takeEvery(smugmugVerificationPinAction, smugmugVerifyPinSaga),
+    takeEvery(
+      action => isDataRequestAction(action, smugmugTestRequestAction),
+      smugmugTestRequestSaga,
     ),
   ]);
 }

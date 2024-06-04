@@ -5,3 +5,6 @@
 export const SMUGMUG_API_KEY = process.env.SMUGMUG_API_KEY;
 export const SMUGMUG_NICKNAME = process.env.SMUGMUG_NICKNAME;
 export const SMUGMUG_API_KEY_SECRET = process.env.SMUGMUG_API_KEY_SECRET;
+export const SMUGMUG_ACCESS_TOKEN = process.env.SMUGMUG_ACCESS_TOKEN;
+export const SMUGMUG_ACCESS_TOKEN_SECRET =
+  process.env.SMUGMUG_ACCESS_TOKEN_SECRET;

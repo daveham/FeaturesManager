@@ -8,6 +8,8 @@ module.exports = function (api) {
           'SMUGMUG_API_KEY',
           'SMUGMUG_API_KEY_SECRET',
           'SMUGMUG_NICKNAME',
+          'SMUGMUG_ACCESS_TOKEN',
+          'SMUGMUG_ACCESS_TOKEN_SECRET',
         ],
       },
     ],

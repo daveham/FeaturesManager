@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { CombinedDefaultTheme as NavigationTheme } from '../theme';
 import { closeSnackbar } from './state/ui/actions';
+import { Authentication } from './screens/Authentication';
 import { Details } from './screens/Details.tsx';
 import { Home } from './screens/Home.tsx';
 import {
@@ -30,6 +31,7 @@ function App(): React.JSX.Element {
         <Stack.Navigator>
           <Stack.Screen name="Home" component={Home} />
           <Stack.Screen name="Details" component={Details} />
+          <Stack.Screen name="Authentication" component={Authentication} />
         </Stack.Navigator>
       </NavigationContainer>
       <Portal>

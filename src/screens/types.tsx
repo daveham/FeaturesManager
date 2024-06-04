@@ -6,11 +6,17 @@ import type {
 export type RootStackParamList = {
   Home: undefined;
   Details: undefined;
+  Authentication: undefined;
 };
 
 export type HomeScreenProps = NativeStackScreenProps<
   RootStackParamList,
   'Home'
+>;
+
+export type AuthenticationScreenProps = NativeStackScreenProps<
+  RootStackParamList,
+  'Authentication'
 >;
 
 export type DetailsScreenProps = NativeStackScreenProps<
