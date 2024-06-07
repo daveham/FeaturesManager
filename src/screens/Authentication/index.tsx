@@ -1,24 +1,15 @@
-import React, { useState } from 'react';
-import {
-  Button,
-  Icon,
-  List,
-  MD3Colors,
-  Portal,
-  Text,
-} from 'react-native-paper';
-import { StyleSheet, View } from 'react-native';
-import { useDispatch, useSelector } from 'react-redux';
+import React, { useEffect, useState } from 'react';
+import { Button, Portal, Text } from 'react-native-paper';
+import { Linking, StyleSheet, View } from 'react-native';
+import { useSelector } from 'react-redux';
 
 import { CombinedDefaultTheme as theme } from '../../../theme';
 import type { AuthenticationScreenProps } from '../types.tsx';
 import {
-  smugmugConsumerCredentialsSelector,
-  smugmugRequestTokenSelector,
   smugmugAuthorizationUrlSelector,
-  smugmugVerificationPinSelector,
   smugmugAccessTokenSelector,
 } from '../../state/api/selectors';
+import usePrevious from '../../shared/hooks/usePreviousHook';
 
 import { SmugmugCredentialsDialog } from './SmugmugCredentialsDialog.tsx';
 import { SmugmugVerificationDialog } from './SmugmugVerificationDialog.tsx';
@@ -33,16 +24,20 @@ const DIALOG_ANIMATION_DURATION =
 export function Authentication(
   _props: AuthenticationScreenProps,
 ): React.JSX.Element {
-  const { smugmugApiKey, smugmugApiSecret } = useSelector(
-    smugmugConsumerCredentialsSelector,
-  );
-  const { oauth_token, oauth_token_secret, oauth_callback_confirmed } =
-    useSelector(smugmugRequestTokenSelector);
   const authorizationUrl = useSelector(smugmugAuthorizationUrlSelector);
-  const smugmugVerificationPin = useSelector(smugmugVerificationPinSelector);
   const { access_token, access_token_secret } = useSelector(
     smugmugAccessTokenSelector,
   );
+
+  const previousAuthorizationUrl = usePrevious(authorizationUrl);
+
+  useEffect(() => {
+    if (authorizationUrl && !previousAuthorizationUrl) {
+      Linking.openURL(authorizationUrl).then(() => {
+        console.log(`opening URL ${authorizationUrl}`);
+      });
+    }
+  }, [authorizationUrl, previousAuthorizationUrl]);
 
   const [isSmugmugCredentialsVisible, setIsSmugmugCredentialsVisible] =
     useState(false);
@@ -104,8 +99,8 @@ export function Authentication(
   };
 
   const isAuthenticated = access_token && access_token_secret;
-  const authButtonEnabled = !isAuthenticated;
-  const verifyButtonEnabled = !isAuthenticated && !authButtonEnabled;
+  const authButtonEnabled = !isAuthenticated && !authorizationUrl;
+  const verifyButtonEnabled = Boolean(authorizationUrl);
 
   const statusText = `This App is ${
     isAuthenticated ? '' : 'not '
@@ -135,10 +130,11 @@ export function Authentication(
         </View>
         <View style={styles.docContainer}>
           <Text variant="bodyLarge">
-            A lot of text will go here to explain the first part of
-            authenticating with SmugMug. Explain the use of the consumer API
-            values that, when submitted will lead to the authenticating on a
-            user account on SmugMug.
+            Authentication consists of two steps. First, submit the API
+            credentials created on SmugMug on the Manage Applications page. You
+            will be prompted to sign into your SmugMug site where you will
+            receive a six-digit verification code. Tap the button below to open
+            the dialog for the first step.
           </Text>
           <View style={styles.buttonContainer}>
             <Button
@@ -151,11 +147,10 @@ export function Authentication(
         </View>
         <View style={styles.docContainer}>
           <Text variant="bodyLarge">
-            A lot of text will go here to explain the second part of
-            authenticating with SmugMug. Explain the use of the verification
-            code that needs to be entered here. Once the code is confirmed, this
-            application will have access to the authenticated user's SmugMug
-            site.
+            For the next step, enter the verification code you received in step
+            one. The app will use the code to acquire credentials that will
+            allow the app to call the API on your behalf. Tap the button below
+            to open the dialog for the second step.
           </Text>
           <View style={styles.buttonContainer}>
             <Button
@@ -169,30 +164,16 @@ export function Authentication(
         <View style={styles.docContainer}>
           <View style={styles.docSection}>
             <Text variant="bodyLarge">
-              Tap the button below to remove the authentication token from this
-              device.
+              If you want to cancel the app's ability to use the SmugMug API on
+              your behalf, tap the button below to remove the authentication
+              token from this device.
             </Text>
           </View>
           <View style={styles.docSection}>
             <Text variant="bodyLarge">
               You also need to revoke the token for this app in your SmugMug
-              account.
-            </Text>
-            <Text variant="bodyLarge">
-              <Icon size={25} source="menu-right" />
-              Visit the Account Settings page in your SmugMug site.
-            </Text>
-            <Text variant="bodyLarge">
-              <Icon size={25} source="menu-right" />
-              Select the Privacy tab.
-            </Text>
-            <Text variant="bodyLarge">
-              <Icon size={25} source="menu-right" />
-              View the Authorized Services table.
-            </Text>
-            <Text variant="bodyLarge">
-              <Icon size={25} source="menu-right" />
-              Tap Revoke Token on the row for "Features Manager".
+              account. This can only be done by logging into your SmugMug site
+              and revoking the token in your site's application settings.
             </Text>
           </View>
           <View style={styles.buttonContainer}>
@@ -222,9 +203,6 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
     paddingTop: 20,
   },
-  boldText: {
-    fontWeight: 'bold',
-  },
   docContainer: {
     paddingBottom: 40,
   },
@@ -237,15 +215,5 @@ const styles = StyleSheet.create({
   },
   statusText: {
     textAlign: 'center',
-  },
-  listItem: {
-    paddingVertical: 0,
-  },
-  listItemContent: {
-    paddingLeft: 0,
-  },
-  listItemIcon: {
-    paddingLeft: 20,
-    paddingRight: 4,
   },
 });

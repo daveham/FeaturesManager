@@ -8,11 +8,8 @@ import {
   smugmugAccessTokenAction,
   smugmugRequestTokenAction,
   smugmugVerificationPinAction,
+  smugmugLoadFromLocalStorageAction,
 } from './actions';
-import {
-  SMUGMUG_ACCESS_TOKEN,
-  SMUGMUG_ACCESS_TOKEN_SECRET,
-} from '../../shared/constants/env-constants';
 
 const CONSUMER_CREDENTIALS_INITIAL_STATE = { key: '', secret: '' };
 
@@ -57,16 +54,25 @@ export const smugmugVerificationPin = handleActions(
 );
 
 const ACCESS_TOKEN_INITIAL_STATE = {
-  // access_token: '',
-  // access_token_secret: '',
-  access_token: SMUGMUG_ACCESS_TOKEN,
-  access_token_secret: SMUGMUG_ACCESS_TOKEN_SECRET,
+  access_token: '',
+  access_token_secret: '',
 };
 
 export const smugmugAccessToken = handleActions(
   {
     [smugmugAccessTokenAction]: (state, action) =>
       isDataResponseAction(action) ? action.payload : state,
+    [smugmugLoadFromLocalStorageAction]: (state, action) => {
+      if (isDataResponseAction(action)) {
+        const { authToken, authTokenSecret } = action.payload;
+        return {
+          ...state,
+          access_token: authToken,
+          access_token_secret: authTokenSecret,
+        };
+      }
+      return state;
+    },
   },
   ACCESS_TOKEN_INITIAL_STATE,
 );

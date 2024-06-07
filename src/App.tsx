@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { NavigationContainer } from '@react-navigation/native';
 import { Portal, Snackbar } from 'react-native-paper';
@@ -15,6 +15,8 @@ import {
   snackbarTextSelector,
 } from './state/ui/selectors';
 import type { RootStackParamList } from './screens/types.tsx';
+import { smugmugLoadFromLocalStorageAction } from './state/api/actions';
+import { makeDataRequestMeta } from './state/utilities';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -24,6 +26,12 @@ function App(): React.JSX.Element {
   const snackbarText = useSelector(snackbarTextSelector);
   const isSnackbarOpen = useSelector(isSnackbarOpenSelector);
   const handleDismissSnackbar = () => dispatch(closeSnackbar());
+
+  useEffect(() => {
+    setTimeout(() => {
+      dispatch(smugmugLoadFromLocalStorageAction({}, makeDataRequestMeta()));
+    }, 1000);
+  });
 
   return (
     <View style={styles.root}>

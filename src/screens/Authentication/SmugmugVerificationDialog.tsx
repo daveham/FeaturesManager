@@ -5,7 +5,7 @@ import { Formik } from 'formik';
 import { StyleSheet } from 'react-native';
 import { useDispatch } from 'react-redux';
 
-// import { smugmugVerificationPinAction } from '../../state/api/actions';
+import { smugmugVerificationPinAction } from '../../state/api/actions';
 
 type smugmugPinFormProps = {
   smugmugVerifierPin: string | undefined;
@@ -31,8 +31,7 @@ export function SmugmugVerificationDialog({
   const dispatch = useDispatch();
 
   const handleVerifyPress = ({ smugmugVerifierPin }: smugmugPinFormProps) => {
-    // temporarily disabled for dev
-    // dispatch(smugmugVerificationPinAction(smugmugVerifierPin));
+    dispatch(smugmugVerificationPinAction(smugmugVerifierPin));
     onClose();
   };
 
@@ -53,48 +52,37 @@ export function SmugmugVerificationDialog({
         errors,
         touched,
         values,
-      }) => {
-        console.log('vrfy-dlg render', {
-          isVisible,
-          isValid,
-          isSubmitting,
-          values,
-        });
-        return (
-          <Dialog visible={isVisible} onDismiss={onClose}>
-            <Dialog.Title>SmugMug Verification Code</Dialog.Title>
-            <Dialog.Content style={styles.content}>
-              <TextInput
-                label="SmugMug Verification PIN"
-                error={Boolean(
-                  touched.smugmugVerifierPin && errors.smugmugVerifierPin,
-                )}
-                value={values.smugmugVerifierPin}
-                onChangeText={handleChange('smugmugVerifierPin')}
-                onBlur={handleBlur('smugmugVerifierPin')}
-                style={styles.formElement}
-              />
-              {touched.smugmugVerifierPin && errors.smugmugVerifierPin && (
-                <HelperText type="error">{`${errors.smugmugVerifierPin}`}</HelperText>
+      }) => (
+        <Dialog visible={isVisible} onDismiss={onClose}>
+          <Dialog.Title>SmugMug Verification Code</Dialog.Title>
+          <Dialog.Content style={styles.content}>
+            <TextInput
+              label="SmugMug Verification PIN"
+              error={Boolean(
+                touched.smugmugVerifierPin && errors.smugmugVerifierPin,
               )}
-            </Dialog.Content>
-            <Dialog.Actions>
-              <Button
-                disabled={!isValid || isSubmitting}
-                mode="contained"
-                onPress={() => handleSubmit()}>
-                Verify PIN
-              </Button>
-              <Button
-                mode="contained"
-                disabled={isSubmitting}
-                onPress={onClose}>
-                Cancel
-              </Button>
-            </Dialog.Actions>
-          </Dialog>
-        );
-      }}
+              value={values.smugmugVerifierPin}
+              onChangeText={handleChange('smugmugVerifierPin')}
+              onBlur={handleBlur('smugmugVerifierPin')}
+              style={styles.formElement}
+            />
+            {touched.smugmugVerifierPin && errors.smugmugVerifierPin && (
+              <HelperText type="error">{`${errors.smugmugVerifierPin}`}</HelperText>
+            )}
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button
+              disabled={!isValid || isSubmitting}
+              mode="contained"
+              onPress={() => handleSubmit()}>
+              Verify PIN
+            </Button>
+            <Button mode="contained" disabled={isSubmitting} onPress={onClose}>
+              Cancel
+            </Button>
+          </Dialog.Actions>
+        </Dialog>
+      )}
     </Formik>
   );
 }

@@ -1,8 +1,14 @@
 import React, { useState } from 'react';
 import * as Yup from 'yup';
-import { Button, Dialog, HelperText, TextInput } from 'react-native-paper';
+import {
+  Button,
+  Dialog,
+  HelperText,
+  Text,
+  TextInput,
+} from 'react-native-paper';
 import { Formik } from 'formik';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { useDispatch } from 'react-redux';
 
 import {
@@ -11,8 +17,9 @@ import {
 } from '../../shared/constants/env-constants';
 import {
   smugmugConsumerCredentialsAction,
-  // smugmugRequestTokenAction,
+  smugmugRequestTokenAction,
 } from '../../state/api/actions';
+import { makeDataRequestMeta } from '../../state/utilities';
 
 type smugmugCredentialsFormProps = {
   smugmugApiKey: string | undefined;
@@ -57,8 +64,7 @@ export function SmugmugCredentialsDialog({
     credentials: smugmugCredentialsFormProps,
   ) => {
     dispatch(smugmugConsumerCredentialsAction(credentials));
-    // temporarily disabled for dev
-    // dispatch(smugmugRequestTokenAction(credentials, makeDataRequestMeta()));
+    dispatch(smugmugRequestTokenAction(credentials, makeDataRequestMeta()));
     onClose();
   };
 
@@ -79,75 +85,77 @@ export function SmugmugCredentialsDialog({
         errors,
         touched,
         values,
-      }) => {
-        console.log('cred-dlg render', {
-          isVisible,
-          isValid,
-          isSubmitting,
-          values,
-          errors,
-          touched,
-        });
-        return (
-          <Dialog visible={isVisible} onDismiss={onClose}>
-            <Dialog.Title>SmugMug API Credentials</Dialog.Title>
-            <Dialog.Content style={styles.content}>
-              <TextInput
-                label="SmugMug API Key"
-                error={Boolean(touched.smugmugApiKey && errors.smugmugApiKey)}
-                value={values.smugmugApiKey}
-                onChangeText={handleChange('smugmugApiKey')}
-                onBlur={handleBlur('smugmugApiKey')}
-                secureTextEntry={!showSmugmugKey}
-                right={
-                  <TextInput.Icon
-                    icon="eye"
-                    onPress={handleShowSmugmugKeyPress}
-                  />
-                }
-                style={styles.formElement}
-              />
-              {touched.smugmugApiKey && errors.smugmugApiKey && (
-                <HelperText type="error">{`${errors.smugmugApiKey}`}</HelperText>
+      }) => (
+        <Dialog visible={isVisible} onDismiss={onClose}>
+          <Dialog.Title>SmugMug API Credentials</Dialog.Title>
+          <Dialog.Content style={styles.content}>
+            <View style={styles.guidanceContainer}>
+              <Text variant="bodyLarge">
+                Enter the API Key and the API Key Secret that you generated in
+                the API keys section of the Account Settings page of your
+                SmugMug site.
+              </Text>
+            </View>
+            <TextInput
+              label="SmugMug API Key"
+              error={Boolean(touched.smugmugApiKey && errors.smugmugApiKey)}
+              value={values.smugmugApiKey}
+              onChangeText={handleChange('smugmugApiKey')}
+              onBlur={handleBlur('smugmugApiKey')}
+              secureTextEntry={!showSmugmugKey}
+              right={
+                <TextInput.Icon
+                  icon="eye"
+                  onPress={handleShowSmugmugKeyPress}
+                />
+              }
+              style={styles.formElement}
+            />
+            {touched.smugmugApiKey && errors.smugmugApiKey && (
+              <HelperText type="error">{`${errors.smugmugApiKey}`}</HelperText>
+            )}
+            <TextInput
+              label="SmugMug API Secret"
+              error={Boolean(
+                touched.smugmugApiSecret && errors.smugmugApiSecret,
               )}
-              <TextInput
-                label="SmugMug API Secret"
-                error={Boolean(
-                  touched.smugmugApiSecret && errors.smugmugApiSecret,
-                )}
-                value={values.smugmugApiSecret}
-                onChangeText={handleChange('smugmugApiSecret')}
-                onBlur={handleBlur('smugmugApiSecret')}
-                secureTextEntry={!showSmugmugSecret}
-                right={
-                  <TextInput.Icon
-                    icon="eye"
-                    onPress={handleShowSmugmugSecretPress}
-                  />
-                }
-                style={styles.formElement}
-              />
-              {touched.smugmugApiSecret && errors.smugmugApiSecret && (
-                <HelperText type="error">{`${errors.smugmugApiSecret}`}</HelperText>
-              )}
-            </Dialog.Content>
-            <Dialog.Actions>
-              <Button
-                disabled={!isValid || isSubmitting}
-                mode="contained"
-                onPress={() => handleSubmit()}>
-                Submit Credentials
-              </Button>
-              <Button
-                mode="contained"
-                disabled={isSubmitting}
-                onPress={onClose}>
-                Cancel
-              </Button>
-            </Dialog.Actions>
-          </Dialog>
-        );
-      }}
+              value={values.smugmugApiSecret}
+              onChangeText={handleChange('smugmugApiSecret')}
+              onBlur={handleBlur('smugmugApiSecret')}
+              secureTextEntry={!showSmugmugSecret}
+              right={
+                <TextInput.Icon
+                  icon="eye"
+                  onPress={handleShowSmugmugSecretPress}
+                />
+              }
+              style={styles.formElement}
+            />
+            {touched.smugmugApiSecret && errors.smugmugApiSecret && (
+              <HelperText type="error">{`${errors.smugmugApiSecret}`}</HelperText>
+            )}
+            <View style={styles.guidanceContainer}>
+              <Text variant="bodyLarge">
+                After these credentials are submitted, the SmugMug website will
+                open in a browser. Log into your SmugMug account and copy the
+                six digit verification code displayed in the browser. Return to
+                this app and use the code for the next step in authentication.
+              </Text>
+            </View>
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button
+              disabled={!isValid || isSubmitting}
+              mode="contained"
+              onPress={() => handleSubmit()}>
+              Submit Credentials
+            </Button>
+            <Button mode="contained" disabled={isSubmitting} onPress={onClose}>
+              Cancel
+            </Button>
+          </Dialog.Actions>
+        </Dialog>
+      )}
     </Formik>
   );
 }
@@ -158,5 +166,8 @@ const styles = StyleSheet.create({
   },
   formElement: {
     marginTop: 15,
+  },
+  guidanceContainer: {
+    paddingVertical: 30,
   },
 });

@@ -21,17 +21,20 @@ import {
 import {
   smugmugRequestTokenAction,
   smugmugAuthorizationUrlAction,
-  smugmugConsumerCredentialsAction,
-  smugmugOauthAction,
   smugmugTestDataAction,
   smugmugVerificationPinAction,
   smugmugAccessTokenAction,
   smugmugTestRequestAction,
+  smugmugLoadFromLocalStorageAction,
 } from '../state/api/actions';
 import {
   smugmugConsumerCredentialsSelector,
   smugmugRequestTokenSelector,
 } from '../state/api/selectors';
+import {
+  readFromLocalStorage,
+  writeToLocalStorage,
+} from '../shared/utilities/storage';
 
 export async function makeSmugmugRequest(url, options = {}, headers = {}) {
   const reqOpts = {
@@ -84,10 +87,6 @@ export function* callApi(fn, args, options = {}) {
       const data = successPayloadTransform
         ? successPayloadTransform(apiResponse)
         : apiResponse;
-      console.log('callApi:transform', {
-        apiResponse,
-        data,
-      });
       yield put(successAction(data, makeDataResponseMeta()));
     }
   } catch (apiSuccessErr) {
@@ -107,10 +106,6 @@ export function* smugmugTestApiSaga() {
       errorAction: smugmugTestDataAction,
     },
   );
-}
-
-export function* smugmugOauthSaga() {
-  yield put(smugmugOauthAction({}, makeDataResponseMeta()));
 }
 
 export function* smugmugGetRequestTokenSaga({
@@ -205,12 +200,35 @@ export function* smugmugVerifyPinSaga({ payload }) {
     }),
   };
 
+  let captureSuccessPayload;
+  let captureSuccessMeta;
   const apiResult = yield* callApi(getRequest, [request.url, headers], {
-    successAction: smugmugAccessTokenAction,
+    successAction: (successPayload, successMeta) => {
+      captureSuccessPayload = successPayload;
+      captureSuccessMeta = successMeta;
+      return smugmugAccessTokenAction(successPayload, successMeta);
+    },
     successPayloadTransform: convertQueryStringToObject,
     errorAction: smugmugAccessTokenAction,
   });
-  console.log('smugmugVerifyPinSaga', { apiResult });
+
+  console.log('smugmugVerifyPinSaga', {
+    apiResult,
+    captureSuccessPayload,
+    captureSuccessMeta,
+  });
+
+  if (apiResult && !captureSuccessMeta?.error) {
+    // write token and secret to local storage
+    try {
+      const { oauth_token: authToken, oauth_token_secret: authTokenSecret } =
+        captureSuccessPayload;
+      yield call(writeToLocalStorage, 'authToken', authToken);
+      yield call(writeToLocalStorage, 'authTokenSecret', authTokenSecret);
+    } catch (e) {
+      console.error('exception in smugmugVerifyPinSaga', e);
+    }
+  }
 }
 
 export function* smugmugTestRequestSaga({
@@ -245,15 +263,28 @@ export function* smugmugTestRequestSaga({
   console.log('smugmugTestRequestSaga', { apiResult });
 }
 
+export function* smugmugLoadFromLocalStorageSaga() {
+  let authToken;
+  let authTokenSecret;
+  try {
+    authToken = yield call(readFromLocalStorage, 'authToken');
+    authTokenSecret = yield call(readFromLocalStorage, 'authTokenSecret');
+    yield put(
+      smugmugLoadFromLocalStorageAction(
+        { authToken, authTokenSecret },
+        makeDataResponseMeta(),
+      ),
+    );
+  } catch (e) {
+    console.error('exception in smugmugVerifyPinSaga', e);
+  }
+}
+
 export default function* rootSaga() {
   yield all([
     takeEvery(
       action => isDataRequestAction(action, smugmugTestDataAction),
       smugmugTestApiSaga,
-    ),
-    takeEvery(
-      action => isDataRequestAction(action, smugmugOauthAction),
-      smugmugOauthSaga,
     ),
     takeEvery(
       action => isDataRequestAction(action, smugmugRequestTokenAction),
@@ -263,6 +294,10 @@ export default function* rootSaga() {
     takeEvery(
       action => isDataRequestAction(action, smugmugTestRequestAction),
       smugmugTestRequestSaga,
+    ),
+    takeEvery(
+      action => isDataRequestAction(action, smugmugLoadFromLocalStorageAction),
+      smugmugLoadFromLocalStorageSaga,
     ),
   ]);
 }

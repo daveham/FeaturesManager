@@ -6,7 +6,7 @@ const dataActionsMap = createActionMapForData([
   'DROPBOX_TEST_DATA',
   'SMUGMUG_ACCESS_TOKEN',
   'SMUGMUG_AUTHORIZATION_URL',
-  'SMUGMUG_OAUTH',
+  'SMUGMUG_LOAD_FROM_LOCAL_STORAGE',
   'SMUGMUG_REQUEST_TOKEN',
   'SMUGMUG_TEST_REQUEST',
   'SMUGMUG_TEST_DATA',
@@ -24,7 +24,7 @@ export const {
   // SmugMug Data Actions
   smugmugAccessTokenAction,
   smugmugAuthorizationUrlAction,
-  smugmugOauthAction,
+  smugmugLoadFromLocalStorageAction,
   smugmugRequestTokenAction,
   smugmugTestRequestAction,
   smugmugTestDataAction,
