@@ -3,11 +3,11 @@ import { Button } from 'react-native-paper';
 import { StyleSheet, View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { isSnackbarOpenSelector } from '../state/ui/selectors';
-import { openSnackbar, closeSnackbar } from '../state/ui/actions';
-import { userDataAction } from '../state/user/actions';
-import { userDataSelector } from '../state/user/selectors';
-import { makeDataRequestMeta } from '../state/utilities';
+import { isSnackbarOpenSelector } from 'state/ui/selectors';
+import { openSnackbar, closeSnackbar } from 'state/ui/actions';
+import { userDataAction } from 'state/user/actions';
+import { userDataSelector } from 'state/user/selectors';
+import { makeDataRequestMeta } from 'state/utilities';
 
 export function Details(): React.JSX.Element {
   const dispatch = useDispatch();

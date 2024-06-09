@@ -4,8 +4,8 @@ import { StyleSheet, View } from 'react-native';
 import { useDispatch } from 'react-redux';
 
 import type { HomeScreenProps } from './types.tsx';
-import { smugmugTestDataAction } from '../state/api/actions';
-import { makeDataRequestMeta } from '../state/utilities';
+import { smugmugTestDataAction } from 'state/api/actions';
+import { makeDataRequestMeta } from 'state/utilities';
 
 export function Home({ navigation }: HomeScreenProps): React.JSX.Element {
   const dispatch = useDispatch();

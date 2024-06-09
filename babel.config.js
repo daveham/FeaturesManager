@@ -1,5 +1,6 @@
 module.exports = function (api) {
-  const presets = ['module:@react-native/babel-preset'];
+  const presets = ['module:metro-react-native-babel-preset'];
+  // const presets = ['module:@react-native/babel-preset'];
   const plugins = [
     [
       'transform-inline-environment-variables',
@@ -15,6 +16,12 @@ module.exports = function (api) {
     ],
   ];
 
+  const env = {
+    production: {
+      plugins: ['react-native-paper/babel'],
+    },
+  };
+
   if (process?.env?.JEST_WORKER_ID) {
     // we are inside jest unit tests
     api.cache.never();
@@ -23,10 +30,25 @@ module.exports = function (api) {
     plugins.unshift([
       'module-resolver',
       {
+        // root: ['.'],
+        extensions: [
+          '.ios.js',
+          '.android.js',
+          '.js',
+          '.jsx',
+          '.ts',
+          '.tsx',
+          '.json',
+        ],
+        // loglevel: 'info',
         alias: {
           crypto: 'react-native-quick-crypto',
           stream: 'stream-browserify',
           buffer: '@craftzdog/react-native-buffer',
+          sagas: './src/sagas',
+          screens: './src/screens',
+          shared: './src/shared',
+          state: './src/state',
         },
       },
     ]);
@@ -34,6 +56,7 @@ module.exports = function (api) {
   }
 
   return {
+    env,
     presets,
     plugins,
   };

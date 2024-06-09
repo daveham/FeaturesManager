@@ -8,8 +8,8 @@ import type { AuthenticationScreenProps } from '../types.tsx';
 import {
   smugmugAuthorizationUrlSelector,
   smugmugAccessTokenSelector,
-} from '../../state/api/selectors';
-import usePrevious from '../../shared/hooks/usePreviousHook';
+} from 'state/api/selectors';
+import usePrevious from 'shared/hooks/usePreviousHook';
 
 import { SmugmugCredentialsDialog } from './SmugmugCredentialsDialog.tsx';
 import { SmugmugVerificationDialog } from './SmugmugVerificationDialog.tsx';

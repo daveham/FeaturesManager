@@ -5,7 +5,7 @@ import { Formik } from 'formik';
 import { StyleSheet } from 'react-native';
 import { useDispatch } from 'react-redux';
 
-import { smugmugVerificationPinAction } from '../../state/api/actions';
+import { smugmugVerificationPinAction } from 'state/api/actions';
 
 type smugmugPinFormProps = {
   smugmugVerifierPin: string | undefined;

@@ -6,17 +6,17 @@ import { StyleSheet, View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { CombinedDefaultTheme as NavigationTheme } from '../theme';
-import { closeSnackbar } from './state/ui/actions';
-import { Authentication } from './screens/Authentication';
-import { Details } from './screens/Details.tsx';
-import { Home } from './screens/Home.tsx';
+import { closeSnackbar } from 'state/ui/actions';
 import {
   isSnackbarOpenSelector,
   snackbarTextSelector,
-} from './state/ui/selectors';
-import type { RootStackParamList } from './screens/types.tsx';
-import { smugmugLoadFromLocalStorageAction } from './state/api/actions';
-import { makeDataRequestMeta } from './state/utilities';
+} from 'state/ui/selectors';
+import { Authentication } from 'screens/Authentication';
+import { Details } from 'screens/Details.tsx';
+import { Home } from 'screens/Home.tsx';
+import type { RootStackParamList } from 'screens/types.tsx';
+import { smugmugLoadFromLocalStorageAction } from 'state/api/actions';
+import { makeDataRequestMeta } from 'state/utilities';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 

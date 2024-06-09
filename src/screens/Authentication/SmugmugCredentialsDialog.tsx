@@ -14,12 +14,12 @@ import { useDispatch } from 'react-redux';
 import {
   SMUGMUG_API_KEY,
   SMUGMUG_API_KEY_SECRET,
-} from '../../shared/constants/env-constants';
+} from 'shared/constants/env-constants';
 import {
   smugmugConsumerCredentialsAction,
   smugmugRequestTokenAction,
-} from '../../state/api/actions';
-import { makeDataRequestMeta } from '../../state/utilities';
+} from 'state/api/actions';
+import { makeDataRequestMeta } from 'state/utilities';
 
 type smugmugCredentialsFormProps = {
   smugmugApiKey: string | undefined;
