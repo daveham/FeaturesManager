@@ -1,30 +1,37 @@
-import type {
-  NativeStackNavigationProp,
-  NativeStackScreenProps,
-} from '@react-navigation/native-stack';
+import {
+  DrawerNavigationProp,
+  DrawerScreenProps,
+} from '@react-navigation/drawer';
+// import type {
+//   NativeStackNavigationProp,
+//   NativeStackScreenProps,
+// } from '@react-navigation/native-stack';
 
-export type RootStackParamList = {
+// export type RootStackParamList = {
+//   Home: undefined;
+//   Details: undefined;
+//   Authentication: undefined;
+// };
+
+export type RootDrawerParamList = {
   Home: undefined;
   Details: undefined;
   Authentication: undefined;
 };
 
-export type HomeScreenProps = NativeStackScreenProps<
-  RootStackParamList,
-  'Home'
->;
+export type HomeScreenProps = DrawerScreenProps<RootDrawerParamList, 'Home'>;
 
-export type AuthenticationScreenProps = NativeStackScreenProps<
-  RootStackParamList,
+export type AuthenticationScreenProps = DrawerScreenProps<
+  RootDrawerParamList,
   'Authentication'
 >;
 
-export type DetailsScreenProps = NativeStackScreenProps<
-  RootStackParamList,
+export type DetailsScreenProps = DrawerScreenProps<
+  RootDrawerParamList,
   'Details'
 >;
 
-export type HomeScreenNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
+export type HomeScreenNavigationProp = DrawerNavigationProp<
+  RootDrawerParamList,
   'Home'
 >;

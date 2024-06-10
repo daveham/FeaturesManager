@@ -4,6 +4,8 @@ import { PaperProvider } from 'react-native-paper';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Provider as ReduxProvider } from 'react-redux';
 
+import 'react-native-gesture-handler';
+
 import { name as appName } from './app.json';
 import App from './src/App';
 import sagas from './src/sagas';

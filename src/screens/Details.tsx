@@ -9,7 +9,9 @@ import { userDataAction } from 'state/user/actions';
 import { userDataSelector } from 'state/user/selectors';
 import { makeDataRequestMeta } from 'state/utilities';
 
-export function Details(): React.JSX.Element {
+import type { DetailsScreenProps } from './types.tsx';
+
+export function Details(_props: DetailsScreenProps): React.JSX.Element {
   const dispatch = useDispatch();
 
   const { firstName, lastName } = useSelector(userDataSelector);

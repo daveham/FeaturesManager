@@ -3,12 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import { Portal, Snackbar } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
 import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-import { Authentication } from 'screens/Authentication';
-import { Details } from 'screens/Details.tsx';
-import { Home } from 'screens/Home.tsx';
-import type { RootStackParamList } from 'screens/types.tsx';
 import { smugmugLoadFromLocalStorageAction } from 'state/api/actions';
 import { closeSnackbar } from 'state/ui/actions';
 import {
@@ -18,8 +13,7 @@ import {
 import { makeDataRequestMeta } from 'state/utilities';
 
 import { CombinedDefaultTheme as NavigationTheme } from '../theme';
-
-const Stack = createNativeStackNavigator<RootStackParamList>();
+import { AppDrawer } from './AppDrawer.tsx';
 
 function App(): React.JSX.Element {
   const dispatch = useDispatch();
@@ -37,11 +31,7 @@ function App(): React.JSX.Element {
   return (
     <View style={styles.root}>
       <NavigationContainer theme={NavigationTheme}>
-        <Stack.Navigator>
-          <Stack.Screen name="Home" component={Home} />
-          <Stack.Screen name="Details" component={Details} />
-          <Stack.Screen name="Authentication" component={Authentication} />
-        </Stack.Navigator>
+        <AppDrawer />
       </NavigationContainer>
       <Portal>
         <Snackbar
