@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import * as Yup from 'yup';
+import { StyleSheet, View } from 'react-native';
 import {
   Button,
   Dialog,
@@ -7,9 +7,9 @@ import {
   Text,
   TextInput,
 } from 'react-native-paper';
-import { Formik } from 'formik';
-import { StyleSheet, View } from 'react-native';
 import { useDispatch } from 'react-redux';
+import { Formik } from 'formik';
+import * as Yup from 'yup';
 
 import {
   SMUGMUG_API_KEY,

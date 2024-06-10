@@ -1,8 +1,7 @@
 import { all, put, takeEvery } from 'redux-saga/effects';
 
-import { isDataRequestAction, makeDataResponseMeta } from 'state/utilities';
-
 import { userDataAction } from 'state/user/actions';
+import { isDataRequestAction, makeDataResponseMeta } from 'state/utilities';
 
 const mockData = {
   js: { firstName: 'John', lastName: 'Smith' },

@@ -1,6 +1,6 @@
-import reducer from '../reducers';
-import { userDataAction } from '../actions';
 import { dataRequestMeta, dataResponseMeta } from '../../utilities';
+import { userDataAction } from '../actions';
+import reducer from '../reducers';
 
 describe('user reducers', () => {
   test('returns the initial state', () => {

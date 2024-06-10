@@ -1,7 +1,7 @@
 import { combineReducers } from 'redux';
 import { handleActions } from 'redux-actions';
 
-import { openSnackbar, closeSnackbar } from './actions';
+import { closeSnackbar, openSnackbar } from './actions';
 
 const INITIAL_SNACKBAR_TEXT_STATE = '';
 

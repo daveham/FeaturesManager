@@ -1,8 +1,8 @@
 import {
   convertQueryStringToObject,
   fastCryptoHash,
-  getNonce,
   getDataAsParameterString,
+  getNonce,
   getRequestParameterString,
   getTimeStamp,
   Oauth,

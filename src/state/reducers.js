@@ -1,8 +1,8 @@
 import { combineReducers } from 'redux';
 
+import api from './api/reducers';
 import ui from './ui/reducers';
 import user from './user/reducers';
-import api from './api/reducers';
 
 export default combineReducers({
   ui,

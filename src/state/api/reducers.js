@@ -3,12 +3,12 @@ import { handleActions } from 'redux-actions';
 
 import { isDataResponseAction } from '../utilities';
 import {
+  smugmugAccessTokenAction,
   smugmugAuthorizationUrlAction,
   smugmugConsumerCredentialsAction,
-  smugmugAccessTokenAction,
+  smugmugLoadFromLocalStorageAction,
   smugmugRequestTokenAction,
   smugmugVerificationPinAction,
-  smugmugLoadFromLocalStorageAction,
 } from './actions';
 
 const CONSUMER_CREDENTIALS_INITIAL_STATE = { key: '', secret: '' };

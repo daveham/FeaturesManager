@@ -1,8 +1,8 @@
 import { combineReducers } from 'redux';
 import { handleActions } from 'redux-actions';
 
-import { userDataAction } from './actions';
 import { isDataResponseAction } from '../utilities';
+import { userDataAction } from './actions';
 
 const INITIAL_STATE = {};
 

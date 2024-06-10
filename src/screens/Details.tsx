@@ -1,10 +1,10 @@
 import React from 'react';
-import { Button } from 'react-native-paper';
 import { StyleSheet, View } from 'react-native';
+import { Button } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
 
+import { closeSnackbar, openSnackbar } from 'state/ui/actions';
 import { isSnackbarOpenSelector } from 'state/ui/selectors';
-import { openSnackbar, closeSnackbar } from 'state/ui/actions';
 import { userDataAction } from 'state/user/actions';
 import { userDataSelector } from 'state/user/selectors';
 import { makeDataRequestMeta } from 'state/utilities';

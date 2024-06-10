@@ -1,14 +1,15 @@
 import * as React from 'react';
 import { AppRegistry, StatusBar /*, useColorScheme */ } from 'react-native';
 import { PaperProvider } from 'react-native-paper';
-import { Provider as ReduxProvider } from 'react-redux';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { Provider as ReduxProvider } from 'react-redux';
 
-import { CombinedDefaultTheme as PaperTheme } from './theme';
-import App from './src/App';
-import createStore, { runSagas } from './src/state/configureStore';
-import sagas from './src/sagas';
 import { name as appName } from './app.json';
+import App from './src/App';
+import sagas from './src/sagas';
+import createStore, { runSagas } from './src/state/configureStore';
+import { CombinedDefaultTheme as PaperTheme } from './theme';
+
 import('./ReactotronConfig');
 
 const store = createStore();

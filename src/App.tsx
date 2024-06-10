@@ -1,22 +1,23 @@
 import React, { useEffect } from 'react';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { NavigationContainer } from '@react-navigation/native';
-import { Portal, Snackbar } from 'react-native-paper';
 import { StyleSheet, View } from 'react-native';
+import { Portal, Snackbar } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-import { CombinedDefaultTheme as NavigationTheme } from '../theme';
-import { closeSnackbar } from 'state/ui/actions';
-import {
-  isSnackbarOpenSelector,
-  snackbarTextSelector,
-} from 'state/ui/selectors';
 import { Authentication } from 'screens/Authentication';
 import { Details } from 'screens/Details.tsx';
 import { Home } from 'screens/Home.tsx';
 import type { RootStackParamList } from 'screens/types.tsx';
 import { smugmugLoadFromLocalStorageAction } from 'state/api/actions';
+import { closeSnackbar } from 'state/ui/actions';
+import {
+  isSnackbarOpenSelector,
+  snackbarTextSelector,
+} from 'state/ui/selectors';
 import { makeDataRequestMeta } from 'state/utilities';
+
+import { CombinedDefaultTheme as NavigationTheme } from '../theme';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 

@@ -1,7 +1,5 @@
-// External Dependencies
 import { useEffect, useRef } from 'react';
 
-// Hook Definition
 function usePrevious(value) {
   const ref = useRef();
   useEffect(() => {

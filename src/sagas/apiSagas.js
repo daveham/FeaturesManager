@@ -1,7 +1,6 @@
-import { all, call, put, select, takeEvery } from 'redux-saga/effects';
 import axios from 'axios';
+import { all, call, put, select, takeEvery } from 'redux-saga/effects';
 
-import { isDataRequestAction, makeDataResponseMeta } from 'state/utilities';
 import {
   SMUGMUG_API_KEY,
   SMUGMUG_NICKNAME,
@@ -17,24 +16,24 @@ import {
   SMUGMUG_REQUEST_TOKEN_URL,
   sortObjectProperties,
 } from 'shared/oauth';
-
 import {
-  smugmugRequestTokenAction,
-  smugmugAuthorizationUrlAction,
-  smugmugTestDataAction,
-  smugmugVerificationPinAction,
+  readFromLocalStorage,
+  writeToLocalStorage,
+} from 'shared/utilities/storage';
+import {
   smugmugAccessTokenAction,
-  smugmugTestRequestAction,
+  smugmugAuthorizationUrlAction,
   smugmugLoadFromLocalStorageAction,
+  smugmugRequestTokenAction,
+  smugmugTestDataAction,
+  smugmugTestRequestAction,
+  smugmugVerificationPinAction,
 } from 'state/api/actions';
 import {
   smugmugConsumerCredentialsSelector,
   smugmugRequestTokenSelector,
 } from 'state/api/selectors';
-import {
-  readFromLocalStorage,
-  writeToLocalStorage,
-} from 'shared/utilities/storage';
+import { isDataRequestAction, makeDataResponseMeta } from 'state/utilities';
 
 export async function makeSmugmugRequest(url, options = {}, headers = {}) {
   const reqOpts = {

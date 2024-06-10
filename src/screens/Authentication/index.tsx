@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Portal, Text } from 'react-native-paper';
 import { Linking, StyleSheet, View } from 'react-native';
+import { Button, Portal, Text } from 'react-native-paper';
 import { useSelector } from 'react-redux';
+
+import usePrevious from 'shared/hooks/usePreviousHook';
+import {
+  smugmugAccessTokenSelector,
+  smugmugAuthorizationUrlSelector,
+} from 'state/api/selectors';
 
 import { CombinedDefaultTheme as theme } from '../../../theme';
 import type { AuthenticationScreenProps } from '../types.tsx';
-import {
-  smugmugAuthorizationUrlSelector,
-  smugmugAccessTokenSelector,
-} from 'state/api/selectors';
-import usePrevious from 'shared/hooks/usePreviousHook';
-
 import { SmugmugCredentialsDialog } from './SmugmugCredentialsDialog.tsx';
 import { SmugmugVerificationDialog } from './SmugmugVerificationDialog.tsx';
 

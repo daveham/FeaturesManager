@@ -1,9 +1,9 @@
 import React from 'react';
-import * as Yup from 'yup';
-import { Button, Dialog, HelperText, TextInput } from 'react-native-paper';
-import { Formik } from 'formik';
 import { StyleSheet } from 'react-native';
+import { Button, Dialog, HelperText, TextInput } from 'react-native-paper';
 import { useDispatch } from 'react-redux';
+import { Formik } from 'formik';
+import * as Yup from 'yup';
 
 import { smugmugVerificationPinAction } from 'state/api/actions';
 

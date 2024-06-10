@@ -1,11 +1,12 @@
 import React from 'react';
-import { Button } from 'react-native-paper';
 import { StyleSheet, View } from 'react-native';
+import { Button } from 'react-native-paper';
 import { useDispatch } from 'react-redux';
 
-import type { HomeScreenProps } from './types.tsx';
 import { smugmugTestDataAction } from 'state/api/actions';
 import { makeDataRequestMeta } from 'state/utilities';
+
+import type { HomeScreenProps } from './types.tsx';
 
 export function Home({ navigation }: HomeScreenProps): React.JSX.Element {
   const dispatch = useDispatch();

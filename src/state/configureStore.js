@@ -2,7 +2,6 @@ import { applyMiddleware, compose, legacy_createStore } from 'redux';
 import createSagaMiddleware from 'redux-saga';
 
 import Reactotron from '../../ReactotronConfig';
-
 import rootReducer from './reducers';
 
 let sagaMiddleware;
