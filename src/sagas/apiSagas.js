@@ -35,6 +35,7 @@ import {
 } from 'state/api/selectors';
 import { isDataRequestAction, makeDataResponseMeta } from 'state/utilities';
 
+// Unauthenticated Requests
 export async function makeSmugmugRequest(url, options = {}, headers = {}) {
   const reqOpts = {
     headers: {
@@ -67,6 +68,8 @@ export function deleteRequest(url, data = {}, headers) {
   return makeSmugmugRequest(url, { method: 'DELETE', data }, headers);
 }
 
+// Helper for calling any of the an-authenticated requests and dispatching
+// success or error actions.
 export function* callApi(fn, args, options = {}) {
   const { successAction, successPayloadTransform, errorAction } = options;
 
@@ -94,6 +97,9 @@ export function* callApi(fn, args, options = {}) {
   return true;
 }
 
+// An example un-authenticated request that allows retrieving read-only data
+// by appending the API key to the end of the URL. This does not require any
+// OAuth mechanisms (tokens or encrypted authorization header).
 export function* smugmugTestApiSaga() {
   yield* callApi(
     getRequest,
@@ -107,6 +113,9 @@ export function* smugmugTestApiSaga() {
   );
 }
 
+// Step one of OAuth 1.0a process: Use API Key and API Key Secret to acquire
+// request token. Then use request token to construct a URL to open in browser
+// for user to retrieve verification code.
 export function* smugmugGetRequestTokenSaga({
   payload: { smugmugApiKey, smugmugApiSecret },
 }) {
@@ -159,22 +168,17 @@ export function* smugmugGetRequestTokenSaga({
   }
 }
 
+// Step two of OAuth 1.0a process: Use the verification code provided by the
+// user to acquire the authentication token and token secret. Save the
+// authentication values to local storage. The payload in the action that
+// triggers this saga is the six-digit verification code.
 export function* smugmugVerifyPinSaga({ payload }) {
-  // at, ats = service.get_access_token(rt, rts, params={'oauth_verifier': verifier})
-
   const { smugmugApiKey, smugmugApiSecret } = yield select(
     smugmugConsumerCredentialsSelector,
   );
   const { oauth_token, oauth_token_secret } = yield select(
     smugmugRequestTokenSelector,
   );
-  console.log('smugmugVerifyPinSaga', {
-    smugmugApiKey,
-    smugmugApiSecret,
-    verifier: payload,
-    oauth_token,
-    oauth_token_secret,
-  });
 
   const token = { key: oauth_token, secret: oauth_token_secret };
 
@@ -211,12 +215,6 @@ export function* smugmugVerifyPinSaga({ payload }) {
     errorAction: smugmugAccessTokenAction,
   });
 
-  console.log('smugmugVerifyPinSaga', {
-    apiResult,
-    captureSuccessPayload,
-    captureSuccessMeta,
-  });
-
   if (apiResult && !captureSuccessMeta?.error) {
     // write token and secret to local storage
     try {
@@ -230,6 +228,9 @@ export function* smugmugVerifyPinSaga({ payload }) {
   }
 }
 
+// The first request that is authenticated with OAuth.
+// TODO: Use this to create generalized helper saga for making any
+//  authenticated request to the SmugMug API.
 export function* smugmugTestRequestSaga({
   payload: {
     smugmugApiKey,
@@ -262,6 +263,9 @@ export function* smugmugTestRequestSaga({
   console.log('smugmugTestRequestSaga', { apiResult });
 }
 
+// This saga is triggered shortly after app start to load any OAuth values found
+// in local storage into redux state. The presence (or absence) of these values
+// in redux is used to enable steps in the authentication UI.
 export function* smugmugLoadFromLocalStorageSaga() {
   let authToken;
   let authTokenSecret;
