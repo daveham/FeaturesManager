@@ -16,6 +16,16 @@ const CONSUMER_CREDENTIALS_INITIAL_STATE = { key: '', secret: '' };
 export const smugmugConsumerCredentials = handleActions(
   {
     [smugmugConsumerCredentialsAction]: (_state, { payload }) => payload,
+    [smugmugLoadFromLocalStorageAction]: (state, action) => {
+      if (isDataResponseAction(action) && !action.meta?.error) {
+        const { smugmugApiKey, smugmugApiSecret } = action.payload;
+        return {
+          key: smugmugApiKey,
+          secret: smugmugApiSecret,
+        };
+      }
+      return state;
+    },
   },
   CONSUMER_CREDENTIALS_INITIAL_STATE,
 );

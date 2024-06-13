@@ -30,6 +30,7 @@ import {
   smugmugVerificationPinAction,
 } from 'state/api/actions';
 import {
+  smugmugAccessTokenSelector,
   smugmugConsumerCredentialsSelector,
   smugmugRequestTokenSelector,
 } from 'state/api/selectors';
@@ -155,6 +156,17 @@ export function* smugmugGetRequestTokenSaga({
   );
 
   if (apiResult && !captureSuccessMeta?.error) {
+    // write token and secret to local storage
+    try {
+      yield call(writeToLocalStorage, 'smugmugApiKey', smugmugApiKey);
+      yield call(writeToLocalStorage, 'smugmugApiSecret', smugmugApiSecret);
+    } catch (e) {
+      console.error(
+        'exception writing to local storage in smugmugVerifyPinSaga',
+        e,
+      );
+    }
+
     const properties = {
       oauth_token: encodeURIComponent(captureSuccessPayload.oauth_token),
       access: 'Full',
@@ -173,9 +185,7 @@ export function* smugmugGetRequestTokenSaga({
 // authentication values to local storage. The payload in the action that
 // triggers this saga is the six-digit verification code.
 export function* smugmugVerifyPinSaga({ payload }) {
-  const { smugmugApiKey, smugmugApiSecret } = yield select(
-    smugmugConsumerCredentialsSelector,
-  );
+  const { key, secret } = yield select(smugmugConsumerCredentialsSelector);
   const { oauth_token, oauth_token_secret } = yield select(
     smugmugRequestTokenSelector,
   );
@@ -183,7 +193,7 @@ export function* smugmugVerifyPinSaga({ payload }) {
   const token = { key: oauth_token, secret: oauth_token_secret };
 
   const oauth = new Oauth({
-    consumer: { key: smugmugApiKey, secret: smugmugApiSecret },
+    consumer: { key, secret },
     signature_method: 'HMAC-SHA1',
     hash_function: fastCryptoHash,
   });
@@ -223,42 +233,47 @@ export function* smugmugVerifyPinSaga({ payload }) {
       yield call(writeToLocalStorage, 'authToken', authToken);
       yield call(writeToLocalStorage, 'authTokenSecret', authTokenSecret);
     } catch (e) {
-      console.error('exception in smugmugVerifyPinSaga', e);
+      console.error(
+        'exception writing to local storage in smugmugVerifyPinSaga',
+        e,
+      );
     }
   }
 }
 
-// The first request that is authenticated with OAuth.
-// TODO: Use this to create generalized helper saga for making any
-//  authenticated request to the SmugMug API.
-export function* smugmugTestRequestSaga({
-  payload: {
-    smugmugApiKey,
-    smugmugApiSecret,
-    access_token,
-    access_token_secret,
-  },
-}) {
-  const token = { key: access_token, secret: access_token_secret };
+export function* prepareAuthRequest(url, method = 'GET') {
+  const { key, secret } = yield select(smugmugConsumerCredentialsSelector);
+  const { access_token, access_token_secret } = yield select(
+    smugmugAccessTokenSelector,
+  );
 
   const oauth = new Oauth({
-    consumer: { key: smugmugApiKey, secret: smugmugApiSecret },
+    consumer: { key, secret },
     signature_method: 'HMAC-SHA1',
     hash_function: fastCryptoHash,
   });
 
+  const token = { key: access_token, secret: access_token_secret };
+
   const request = {
-    url: `${SMUGMUG_BASE_URL}!authuser`,
-    method: 'GET',
+    url: `${SMUGMUG_BASE_URL}${url}`,
+    method,
   };
 
   const headers = oauth.toHeader(oauth.authorize(request, token), {
     Accept: 'application/json',
   });
 
-  const apiResult = yield* callApi(getRequest, [request.url, headers], {
+  return [request.url, headers];
+}
+
+// The first request that is authenticated with OAuth.
+export function* smugmugTestRequestSaga(_action) {
+  const requestArgs = yield* prepareAuthRequest('!authuser');
+  const apiResult = yield* callApi(getRequest, requestArgs, {
     successAction: smugmugTestRequestAction,
     errorAction: smugmugTestRequestAction,
+    successPayloadTransform: data => data.Response.User,
   });
   console.log('smugmugTestRequestSaga', { apiResult });
 }
@@ -267,14 +282,18 @@ export function* smugmugTestRequestSaga({
 // in local storage into redux state. The presence (or absence) of these values
 // in redux is used to enable steps in the authentication UI.
 export function* smugmugLoadFromLocalStorageSaga() {
-  let authToken;
-  let authTokenSecret;
   try {
-    authToken = yield call(readFromLocalStorage, 'authToken');
-    authTokenSecret = yield call(readFromLocalStorage, 'authTokenSecret');
+    const authToken = yield call(readFromLocalStorage, 'authToken');
+    const authTokenSecret = yield call(readFromLocalStorage, 'authTokenSecret');
+    const smugmugApiKey = yield call(readFromLocalStorage, 'smugmugApiKey');
+    const smugmugApiSecret = yield call(
+      readFromLocalStorage,
+      'smugmugApiSecret',
+    );
+
     yield put(
       smugmugLoadFromLocalStorageAction(
-        { authToken, authTokenSecret },
+        { authToken, authTokenSecret, smugmugApiKey, smugmugApiSecret },
         makeDataResponseMeta(),
       ),
     );
