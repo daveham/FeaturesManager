@@ -25,7 +25,7 @@ function App(): React.JSX.Element {
   useEffect(() => {
     setTimeout(() => {
       dispatch(smugmugLoadFromLocalStorageAction({}, makeDataRequestMeta()));
-    }, 1000);
+    }, 100);
   });
 
   return (

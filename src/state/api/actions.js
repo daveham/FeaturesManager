@@ -8,7 +8,6 @@ const dataActionsMap = createActionMapForData([
   'SMUGMUG_AUTHORIZATION_URL',
   'SMUGMUG_LOAD_FROM_LOCAL_STORAGE',
   'SMUGMUG_REQUEST_TOKEN',
-  'SMUGMUG_TEST_REQUEST',
   'SMUGMUG_TEST_DATA',
 ]);
 
@@ -26,7 +25,6 @@ export const {
   smugmugAuthorizationUrlAction,
   smugmugLoadFromLocalStorageAction,
   smugmugRequestTokenAction,
-  smugmugTestRequestAction,
   smugmugTestDataAction,
 
   // SmugMug Identity Actions

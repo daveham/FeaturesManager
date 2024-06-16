@@ -7,3 +7,11 @@ export const smugmugRequestTokenSelector = state =>
 export const smugmugAccessTokenSelector = state => state.api.smugmugAccessToken;
 export const smugmugVerificationPinSelector = state =>
   state.api.smugmugVerificationPin;
+
+export const isAuthenticatedSelector = state => {
+  const { key, secret } = smugmugConsumerCredentialsSelector(state);
+  const { access_token, access_token_secret } =
+    smugmugAccessTokenSelector(state);
+
+  return key && secret && access_token && access_token_secret;
+};

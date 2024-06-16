@@ -15,7 +15,7 @@ module.exports = {
           // Packages. `react` related packages come first.
           ['^react', '^@?\\w'],
           // Internal packages.
-          ['^(state|screens|shared|sagas)(/.*|$)'],
+          ['^(components|state|screens|shared|sagas)(/.*|$)'],
           // Side effect imports.
           ['^\\u0000'],
           // Node.js builtins prefixed with `node:`.
@@ -41,6 +41,7 @@ module.exports = {
     'import/resolver': {
       'eslint-import-resolver-custom-alias': {
         alias: {
+          components: './src/components',
           sagas: './src/sagas',
           screens: './src/screens',
           shared: './src/shared',

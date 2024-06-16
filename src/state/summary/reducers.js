@@ -1,14 +1,19 @@
 import { combineReducers } from 'redux';
 import { handleActions } from 'redux-actions';
 
-import { smugmugTestRequestAction } from 'state/api/actions';
-import { isDataRequestAction, isDataResponseAction } from 'state/utilities';
+import {
+  isBackgroundDataRequest,
+  isDataRequestAction,
+  isDataResponseAction,
+} from 'state/utilities';
+
+import { summaryDataAction } from './actions';
 
 const SUMMARY_INITIAL_STATE = {};
 
 export const summary = handleActions(
   {
-    [smugmugTestRequestAction]: (state, action) => {
+    [summaryDataAction]: (state, action) => {
       if (isDataResponseAction(action)) {
         return action.payload;
       }
@@ -20,8 +25,8 @@ export const summary = handleActions(
 
 export const summaryLoading = handleActions(
   {
-    [smugmugTestRequestAction]: (state, action) => {
-      if (isDataRequestAction(action)) {
+    [summaryDataAction]: (state, action) => {
+      if (isDataRequestAction(action) && !isBackgroundDataRequest(action)) {
         return true;
       }
       if (isDataResponseAction(action)) {

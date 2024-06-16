@@ -46,6 +46,7 @@ module.exports = function (api) {
           crypto: 'react-native-quick-crypto',
           stream: 'stream-browserify',
           buffer: '@craftzdog/react-native-buffer',
+          components: './src/components',
           sagas: './src/sagas',
           screens: './src/screens',
           shared: './src/shared',
