@@ -79,3 +79,6 @@ yarn-error.log
 
 # caches
 .jest
+
+# ignore Writerside for now
+/Writerside
