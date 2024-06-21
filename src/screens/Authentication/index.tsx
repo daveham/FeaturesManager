@@ -9,7 +9,7 @@ import {
   smugmugAuthorizationUrlSelector,
 } from 'state/api/selectors';
 
-import { CombinedDefaultTheme as theme } from '../../../theme';
+import { theme } from '../../../theme';
 import type { AuthenticationScreenProps } from '../types.tsx';
 import { SmugmugCredentialsDialog } from './SmugmugCredentialsDialog.tsx';
 import { SmugmugVerificationDialog } from './SmugmugVerificationDialog.tsx';

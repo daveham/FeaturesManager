@@ -17,6 +17,7 @@ export type RootDrawerParamList = {
   Home: undefined;
   Details: undefined;
   Authentication: undefined;
+  Explore: undefined;
 };
 
 export type HomeScreenProps = DrawerScreenProps<RootDrawerParamList, 'Home'>;
@@ -29,6 +30,11 @@ export type AuthenticationScreenProps = DrawerScreenProps<
 export type DetailsScreenProps = DrawerScreenProps<
   RootDrawerParamList,
   'Details'
+>;
+
+export type ExploreScreenProps = DrawerScreenProps<
+  RootDrawerParamList,
+  'Explore'
 >;
 
 export type HomeScreenNavigationProp = DrawerNavigationProp<

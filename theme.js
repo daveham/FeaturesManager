@@ -24,7 +24,7 @@ const figmaLightColors = {
   onTertiaryContainer: '#454500',
   error: '#BA1A1A',
   onError: '#FFFFFF',
-  errorContainer: '#FFDAD6',
+  errorContainer: '#D05020', // '#FFDAD6',
   onErrorContainer: '#410002',
   background: '#FCF8FB',
   onBackground: '#1B1B1D',
@@ -159,6 +159,7 @@ export const CombinedDefaultTheme = {
     ...LightTheme.colors,
     ...figmaLightColors,
   },
+  roundness: 2,
 };
 
 export const CombinedDarkTheme = {
@@ -169,4 +170,7 @@ export const CombinedDarkTheme = {
     ...DarkTheme.colors,
     ...figmaDarkColors,
   },
+  roundness: 2,
 };
+
+export const theme = CombinedDefaultTheme;

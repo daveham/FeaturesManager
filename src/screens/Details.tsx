@@ -24,7 +24,9 @@ export function Details(_props: DetailsScreenProps): React.JSX.Element {
     } else {
       dispatch(userDataAction('bf', makeDataRequestMeta()));
       dispatch(
-        openSnackbar('User name has been requested from Details screen.'),
+        openSnackbar({
+          text: 'User name has been requested from Details screen.',
+        }),
       );
     }
   };

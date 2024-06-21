@@ -3,14 +3,14 @@ import { handleActions } from 'redux-actions';
 
 import { closeSnackbar, openSnackbar } from './actions';
 
-const INITIAL_SNACKBAR_TEXT_STATE = '';
+const INITIAL_SNACKBAR_CONTENT_STATE = { text: '', error: false };
 
-export const snackbarText = handleActions(
+export const snackbarContent = handleActions(
   {
     [openSnackbar]: (_state, { payload }) => payload,
-    [closeSnackbar]: _state => INITIAL_SNACKBAR_TEXT_STATE,
+    [closeSnackbar]: _state => INITIAL_SNACKBAR_CONTENT_STATE,
   },
-  INITIAL_SNACKBAR_TEXT_STATE,
+  INITIAL_SNACKBAR_CONTENT_STATE,
 );
 
 export const isSnackbarOpen = handleActions(
@@ -21,4 +21,4 @@ export const isSnackbarOpen = handleActions(
   false,
 );
 
-export default combineReducers({ isSnackbarOpen, snackbarText });
+export default combineReducers({ isSnackbarOpen, snackbarContent });

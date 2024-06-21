@@ -51,6 +51,17 @@ export function makeDataResponseMeta(meta) {
   return meta ? { ...meta, ...dataResponseMeta } : dataResponseMeta;
 }
 
+export function makeErrorDataResponseMeta(meta) {
+  if (meta) {
+    return {
+      ...meta,
+      ...dataResponseMeta,
+      error: true,
+    };
+  }
+  return { ...dataResponseMeta, error: true };
+}
+
 // Make meta value for data request that should not activate an activity/loading indicator.
 export function makeBackgroundDataRequestMeta(meta) {
   return meta

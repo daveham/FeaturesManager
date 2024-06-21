@@ -13,7 +13,8 @@ export const SMUGMUG_ACCESS_TOKEN_URL =
 export const SMUGMUG_AUTHORIZE_URL =
   SMUGMUG_OAUTH_ORIGIN + '/services/oauth/1.0a/authorize';
 export const SMUGMUG_API_ORIGIN = 'https://api.smugmug.com';
-export const SMUGMUG_BASE_URL = `${SMUGMUG_API_ORIGIN}/api/v2`;
+export const API_V2 = '/api/v2';
+export const SMUGMUG_BASE_URL = `${SMUGMUG_API_ORIGIN}${API_V2}`;
 
 /* from python example
   SERVICE = OAuth1Service(
