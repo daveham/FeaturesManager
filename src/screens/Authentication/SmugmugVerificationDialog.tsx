@@ -57,6 +57,8 @@ export function SmugmugVerificationDialog({
           <Dialog.Title>SmugMug Verification Code</Dialog.Title>
           <Dialog.Content style={styles.content}>
             <TextInput
+              autoCapitalize="none"
+              autoCorrect={false}
               label="SmugMug Verification PIN"
               error={Boolean(
                 touched.smugmugVerifierPin && errors.smugmugVerifierPin,

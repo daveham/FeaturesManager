@@ -97,6 +97,8 @@ export function SmugmugCredentialsDialog({
               </Text>
             </View>
             <TextInput
+              autoCapitalize="none"
+              autoCorrect={false}
               label="SmugMug API Key"
               error={Boolean(touched.smugmugApiKey && errors.smugmugApiKey)}
               value={values.smugmugApiKey}
@@ -115,6 +117,8 @@ export function SmugmugCredentialsDialog({
               <HelperText type="error">{`${errors.smugmugApiKey}`}</HelperText>
             )}
             <TextInput
+              autoCapitalize="none"
+              autoCorrect={false}
               label="SmugMug API Secret"
               error={Boolean(
                 touched.smugmugApiSecret && errors.smugmugApiSecret,

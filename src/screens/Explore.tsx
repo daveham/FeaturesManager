@@ -1,10 +1,17 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { Button, Dialog, HelperText, TextInput } from 'react-native-paper';
+import {
+  Button,
+  Dialog,
+  HelperText,
+  Text,
+  TextInput,
+} from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 
+import { API_V2 } from 'shared/oauth';
 import { exploreDataAction } from 'state/explore/actions';
 import { exploreLoadingSelector } from 'state/explore/selectors';
 import { makeDataRequestMeta } from 'state/utilities';
@@ -54,7 +61,21 @@ export function Explore(_props: ExploreScreenProps): React.JSX.Element {
           <Dialog visible dismissable={false}>
             <Dialog.Title>Query SmugMug Data</Dialog.Title>
             <Dialog.Content>
+              <View style={styles.helpContainer}>
+                <Text style={styles.helpText}>
+                  Enter a valid SmugMug API expression. For example, the URI for
+                  an Album:
+                </Text>
+                <Text style={styles.exampleText}>/api/v2/album/67FH2H</Text>
+                <Text style={styles.helpText}>
+                  You don't have to include the first part of the URI,
+                  <Text style={styles.inlineExampleText}>{` ${API_V2}`}</Text>
+                </Text>
+                <Text style={styles.exampleText}>album/67FH2H</Text>
+              </View>
               <TextInput
+                autoCapitalize="none"
+                autoCorrect={false}
                 label="Expression"
                 error={Boolean(touched.query && errors.query)}
                 value={values.query}
@@ -92,5 +113,27 @@ const styles = StyleSheet.create({
   },
   formElement: {
     marginTop: 15,
+  },
+  helpContainer: {
+    paddingTop: 20,
+    paddingBottom: 10,
+    paddingLeft: 30,
+    paddingRight: 10,
+  },
+  helpText: {
+    fontSize: 16,
+  },
+  exampleText: {
+    fontSize: 16,
+    fontFamily: 'Menlo',
+    fontWeight: 'bold',
+    paddingLeft: 20,
+    marginTop: 12,
+    marginBottom: 20,
+  },
+  inlineExampleText: {
+    fontSize: 16,
+    fontFamily: 'Menlo',
+    fontWeight: 'bold',
   },
 });
