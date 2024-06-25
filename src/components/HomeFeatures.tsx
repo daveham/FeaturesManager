@@ -13,6 +13,8 @@ import {
 
 import { theme } from '../../theme.js';
 
+// Due to inline handler for "left" property in List.Item.
+/* eslint-disable react/no-unstable-nested-components */
 export function HomeFeatures(): React.JSX.Element {
   const loading = useSelector(homePageFeaturesDataLoadingSelector);
   const destination = useSelector(homePageFeatureDestinationSelector);
@@ -127,6 +129,7 @@ export function HomeFeatures(): React.JSX.Element {
     </View>
   );
 }
+/* eslint-enable react/no-unstable-nested-components */
 
 /*
           {
