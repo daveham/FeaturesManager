@@ -86,7 +86,7 @@ export function HomeFeatures(): React.JSX.Element {
                     <View style={styles.descriptionContainer}>
                       <View style={styles.descriptionTermContainer}>
                         <Text style={styles.srcDescriptionValue}>
-                          {destination.imageCount}
+                          {item.imageCount}
                         </Text>
                         <Text style={styles.srcDescriptionLabel}>
                           {' images'}
@@ -99,7 +99,7 @@ export function HomeFeatures(): React.JSX.Element {
                             styles.pushLabelRight,
                           ]}>{` Last Updated `}</Text>
                         <Text style={styles.srcDescriptionValue}>
-                          {dayjs(destination.imagesLastUpdated).format(
+                          {dayjs(item.imagesLastUpdated).format(
                             'MMM D, YYYY H:mm:ss A',
                           )}
                         </Text>
