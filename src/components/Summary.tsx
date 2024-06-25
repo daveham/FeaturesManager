@@ -95,7 +95,7 @@ export function Summary(): React.JSX.Element {
 const CONTAINER_SPACING_UNIT = 20;
 const styles = StyleSheet.create({
   root: {
-    // flex: 1,
+    minHeight: 4 * CONTAINER_SPACING_UNIT,
     paddingHorizontal: CONTAINER_SPACING_UNIT,
     paddingTop: CONTAINER_SPACING_UNIT,
     width: '100%',

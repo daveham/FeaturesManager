@@ -3,10 +3,11 @@ import { StyleSheet, View } from 'react-native';
 import { Button } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
 
+import { HomeFeatures } from 'components/HomeFeatures';
 import { Summary } from 'components/Summary';
 import usePreviousHook from 'shared/hooks/usePreviousHook';
 import { isAuthenticatedSelector } from 'state/api/selectors';
-import { homePageDataAction } from 'state/homeFeatures/actions';
+import { homePageFeaturesDataAction } from 'state/homeFeatures/actions';
 import { homePageDataLoadingSelector } from 'state/homeFeatures/selectors';
 import { summaryDataAction } from 'state/summary/actions';
 import { makeDataRequestMeta } from 'state/utilities';
@@ -28,12 +29,13 @@ export function Home(_props: HomeScreenProps): React.JSX.Element {
   }, [dispatch, isAuthenticated, previousIsAuthenticated]);
 
   const handleLoadHomePageDataPress = () => {
-    dispatch(homePageDataAction({}, makeDataRequestMeta()));
+    dispatch(homePageFeaturesDataAction({}, makeDataRequestMeta()));
   };
 
   return (
     <View style={styles.root}>
       <Summary />
+      <HomeFeatures />
       <View style={styles.buttonContainer}>
         <Button
           mode="contained"

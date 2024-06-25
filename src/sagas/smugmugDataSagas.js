@@ -2,13 +2,15 @@ import { all, put, select, takeEvery } from 'redux-saga/effects';
 
 import {
   exploreDataAction,
-  homePageDataAction,
+  homePageFeaturesDataAction,
+  homePageFeaturesDataProgressAction,
 } from 'state/homeFeatures/actions';
 import { summaryDataAction } from 'state/summary/actions';
 import { summaryDataSelector } from 'state/summary/selectors';
 import { openSnackbar } from 'state/ui/actions';
 import {
   isDataRequestAction,
+  makeDataResponseMeta,
   makeErrorDataResponseMeta,
 } from 'state/utilities';
 
@@ -31,35 +33,53 @@ const rootNodeQueryExpansion = JSON.stringify({
     },
   },
 });
+
+const featuresNodeQueryExpansion = JSON.stringify({
+  expand: {
+    ChildNodes: {
+      expand: {
+        Album: {
+          expand: {
+            AlbumHighlightImage: {},
+          },
+        },
+      },
+      args: {
+        count: 20,
+      },
+    },
+  },
+});
+
 // const rootNodeQueryExpansionKey = '/api/v2/node/WrXjf!children?count=25';
 
-export function* homePageDataErrorSaga(message) {
-  console.log('homePageDataErrorSaga', message);
-  yield put(summaryDataAction(message, makeErrorDataResponseMeta()));
+export function* homePageFeaturesDataErrorSaga(message) {
+  console.log('homePageFeaturesDataErrorSaga', message);
+  yield put(homePageFeaturesDataAction(message, makeErrorDataResponseMeta()));
   yield put(openSnackbar({ text: message }));
 }
 
-export function* homePageDataSaga(_action) {
+export function* homePageFeaturesDataSaga(_action) {
   const summaryData = yield select(summaryDataSelector);
 
   // get the URI for the root node from the summary data
   const rootNodeUri = summaryData?.Uris?.Node?.Uri;
   if (!rootNodeUri) {
-    yield* homePageDataErrorSaga('Summary data not loaded.');
-    return;
+    return yield* homePageFeaturesDataErrorSaga('Summary data not loaded.');
   }
 
   let capturedData;
   const intercept = (payload, meta) => {
     capturedData = payload;
-    return homePageDataAction(payload, meta);
+    return homePageFeaturesDataProgressAction(payload, meta);
   };
 
+  // Get root node's children so we can find the Features folder.
   let url = `${rootNodeUri}?_config=${rootNodeQueryExpansion}`;
   const requestArgs = yield* prepareAuthRequest(url);
   let result = yield* callApi(getRequest, requestArgs, {
     successAction: intercept,
-    errorAction: homePageDataAction,
+    errorAction: homePageFeaturesDataAction,
   });
   if (!result) {
     return;
@@ -75,20 +95,23 @@ export function* homePageDataSaga(_action) {
     expansionData,
   });
 
+  // Find the Features node by name.
   const featuresNode = expansionData.Node.find(n => n.Name === 'Features');
   if (!featuresNode) {
-    yield* homePageDataErrorSaga('Failed to find Features node.');
-    return;
+    return yield* homePageFeaturesDataErrorSaga(
+      'Failed to find Features node.',
+    );
   }
 
   // Get all of the albums in the features folder.
-  const featuresFolderChildrenUri = `/node/${featuresNode.NodeID}!children?count=20`;
+  // const featuresFolderChildrenUri = `/node/${featuresNode.NodeID}!children?count=20`;
+  const featuresFolderChildrenUri = `/node/${featuresNode.NodeID}?_config=${featuresNodeQueryExpansion}`;
   const featuresFolderChildrenRequestArgs = yield* prepareAuthRequest(
     featuresFolderChildrenUri,
   );
   result = yield* callApi(getRequest, featuresFolderChildrenRequestArgs, {
     successAction: intercept,
-    errorAction: exploreDataAction,
+    errorAction: homePageFeaturesDataAction,
   });
   if (!result) {
     return;
@@ -98,17 +121,95 @@ export function* homePageDataSaga(_action) {
     capturedData,
   });
 
-  const featureSources = capturedData.Response.Node.filter(
-    n => n.Name !== 'Home',
-  ).map(n => ({ name: n.Name, nodeId: n.NodeID }));
+  // captureData.Response.Node has Features Folder node
+  //  Name: Features, NodeID:vKhjrb
 
-  const homeNode = capturedData.Response.Node.find(n => n.Name === 'Home');
-  const featureDestination = { name: homeNode.Name, nodeId: homeNode.NodeID };
+  // captureData.Expansion[/api/v2/node/vKhjrb!children?count=20] has parent folder of child Album nodes
+  //   .Locator: Node
+  //   .Node - array of child node objects
+
+  // captureData.Expansions[/api/v2/album/Xbg97R] - Highlights
+  //   .Locator: Album
+  //   .Album.* - album properties
+  //     .AlbumKey, .HighlightAlbumImageUri, .Title, .Name, .ImageCount
+  //     .Uris.AlbumImages.Uri
+  // captureData.Expansions[/api/v2/album/D8XCpf] - Home
+  // captureData.Expansions[/api/v2/album/GQwJfP] - Wildflowers
+  // captureData.Expansions[/api/v2/album/67FH2H] - Rocks
+  // captureData.Expansions[/api/v2/album/6CjZck] - Parade
+  // captureData.Expansions[/api/v2/album/qW3HrV] - Boulders
+  // captureData.Expansions[/api/v2/album/rjm9fc] - Bison
+
+  // Object.keys(capturedData.Expansions).map(key => {
+  //    identify by Expansions[key].Locator = Album or Node
+  // }
+
+  let featureSources = [];
+  let featureDestination;
+  let highlightImages = [];
+  Object.keys(capturedData.Expansions).forEach(key => {
+    const child = capturedData.Expansions[key];
+    if (child.Locator === 'Album') {
+      const album = child.Album;
+      const data = {
+        name: album.Name,
+        key: album.AlbumKey,
+        nodeId: album.NodeID,
+        description: album.Description,
+        imageCount: album.ImageCount,
+        imagesLastUpdated: album.ImagesLastUpdated,
+        highlightImageUri: album.HighlightAlbumImageUri,
+        albumImagesUri: album.Uris.AlbumImages.Uri,
+      };
+      if (album.Name === 'Home') {
+        featureDestination = data;
+      } else {
+        featureSources.push(data);
+      }
+    } else if (child.Locator === 'AlbumImage') {
+      const albumImage = child.AlbumImage;
+      highlightImages.push({
+        thumbnailUrl: albumImage.ThumbnailUrl,
+        title: albumImage.Title,
+        key: albumImage.ImageKey,
+        albumKey: albumImage.AlbumKey,
+        collectedFrom: albumImage.CollectedFrom,
+      });
+    }
+  });
 
   console.log('homePageDataSaga features nodes', {
     featureDestination,
     featureSources,
+    highlightImages,
   });
+
+  let hasImageError = false;
+  highlightImages.forEach(image => {
+    if (image.albumKey === featureDestination.key) {
+      featureDestination.highlightImage = image;
+    } else {
+      const owner = featureSources.find(s => s.key === image.albumKey);
+      if (owner) {
+        owner.highlightImage = image;
+      } else {
+        hasImageError = true;
+      }
+    }
+  });
+
+  if (hasImageError) {
+    return yield* homePageFeaturesDataErrorSaga(
+      'Could not connect highlight image with an album.',
+    );
+  }
+
+  yield put(
+    homePageFeaturesDataAction(
+      { featureSources, featureDestination },
+      makeDataResponseMeta(),
+    ),
+  );
 
   // Simple Spaces Page as node - no children
   // let exploreUrl = '/api/v2/node/2s5WnS';
@@ -158,8 +259,8 @@ export default function* rootSaga() {
       summaryDataSaga,
     ),
     takeEvery(
-      action => isDataRequestAction(action, homePageDataAction),
-      homePageDataSaga,
+      action => isDataRequestAction(action, homePageFeaturesDataAction),
+      homePageFeaturesDataSaga,
     ),
     takeEvery(
       action => isDataRequestAction(action, exploreDataAction),

@@ -8,8 +8,18 @@ const dataActionsMap = createActionMapForData([
   'HOME_PAGE_FEATURES_DATA',
 ]);
 
+const identityActions = [
+  'HOME_PAGE_DATA_PROGRESS_ACTION',
+  'HOME_PAGE_FEATURES_DATA_PROGRESS_ACTION',
+];
+
 export const {
+  // Data Actions
   exploreDataAction,
   homePageDataAction,
   homePageFeaturesDataAction,
-} = createActions(dataActionsMap);
+
+  // Identity Actions
+  homePageDataProgressAction,
+  homePageFeaturesDataProgressAction,
+} = createActions(dataActionsMap, ...identityActions);
