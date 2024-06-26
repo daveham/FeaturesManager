@@ -37,21 +37,21 @@ export function HomeFeatures(): React.JSX.Element {
               titleStyle={styles.destListItemTitle}
               description={
                 <View style={styles.descriptionContainer}>
-                  <View style={styles.descriptionTermContainer}>
+                  <View style={styles.descriptionTermContainerLeft}>
                     <Text style={styles.destDescriptionValue}>
                       {destination.imageCount}
                     </Text>
                     <Text style={styles.destDescriptionLabel}>{' images'}</Text>
                   </View>
-                  <View style={styles.descriptionTermContainer}>
+                  <View style={styles.descriptionTermContainerRight}>
                     <Text
                       style={[
                         styles.destDescriptionLabel,
                         styles.pushLabelRight,
-                      ]}>{` Last Updated `}</Text>
+                      ]}>{`Last Updated  `}</Text>
                     <Text style={styles.destDescriptionValue}>
                       {dayjs(destination.imagesLastUpdated).format(
-                        'MMM D, YYYY H:mm:ss A',
+                        'MMM D, YYYY  H:mm:ss A',
                       )}
                     </Text>
                   </View>
@@ -84,7 +84,7 @@ export function HomeFeatures(): React.JSX.Element {
                   titleStyle={styles.srcListItemTitle}
                   description={
                     <View style={styles.descriptionContainer}>
-                      <View style={styles.descriptionTermContainer}>
+                      <View style={styles.descriptionTermContainerLeft}>
                         <Text style={styles.srcDescriptionValue}>
                           {item.imageCount}
                         </Text>
@@ -92,15 +92,15 @@ export function HomeFeatures(): React.JSX.Element {
                           {' images'}
                         </Text>
                       </View>
-                      <View style={styles.descriptionTermContainer}>
+                      <View style={styles.descriptionTermContainerRight}>
                         <Text
                           style={[
                             styles.srcDescriptionLabel,
                             styles.pushLabelRight,
-                          ]}>{` Last Updated `}</Text>
+                          ]}>{`Last Updated  `}</Text>
                         <Text style={styles.srcDescriptionValue}>
                           {dayjs(item.imagesLastUpdated).format(
-                            'MMM D, YYYY H:mm:ss A',
+                            'MMM D, YYYY  H:mm:ss A',
                           )}
                         </Text>
                       </View>
@@ -183,8 +183,13 @@ const styles = StyleSheet.create({
     width: '100%',
     justifyContent: 'space-between',
   },
-  descriptionTermContainer: {
+  descriptionTermContainerLeft: {
     flexDirection: 'row',
+    flex: 1,
+  },
+  descriptionTermContainerRight: {
+    flexDirection: 'row',
+    flex: 4,
   },
   pushLabelRight: {
     marginLeft: 30,
