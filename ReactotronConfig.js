@@ -11,7 +11,8 @@ if (__DEV__ && process.env.NODE_ENV !== 'test') {
     onConnect: () => Reactotron.clear(),
   })
     .setAsyncStorageHandler(AsyncStorage)
-    .useReactNative()
+    // Disable logging to console since we are using a different logger for that.
+    .useReactNative({ log: false })
     .use(reactotronRedux())
     .use(networking())
     .use(sagaPlugin());

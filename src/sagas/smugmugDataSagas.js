@@ -1,5 +1,6 @@
 import { all, put, select, takeEvery } from 'redux-saga/effects';
 
+import log from 'shared/utilities/logger';
 import {
   exploreDataAction,
   homePageFeaturesDataAction,
@@ -54,7 +55,7 @@ const featuresNodeQueryExpansion = JSON.stringify({
 // const rootNodeQueryExpansionKey = '/api/v2/node/WrXjf!children?count=25';
 
 export function* homePageFeaturesDataErrorSaga(message) {
-  console.log('homePageFeaturesDataErrorSaga', message);
+  log.error('homePageFeaturesDataErrorSaga', message);
   yield put(homePageFeaturesDataAction(message, makeErrorDataResponseMeta()));
   yield put(openSnackbar({ text: message }));
 }
@@ -89,7 +90,7 @@ export function* homePageFeaturesDataSaga(_action) {
   const expansionKey = `${baseUri}!children?count=25`;
   const expansionData = capturedData.Expansions[expansionKey];
 
-  console.log('homePageDataSaga from root node query', {
+  log.debug('homePageDataSaga from root node query', {
     capturedData,
     expansionKey,
     expansionData,
@@ -117,7 +118,7 @@ export function* homePageFeaturesDataSaga(_action) {
     return;
   }
 
-  console.log('homePageDataSaga from features nodes query', {
+  log.debug('homePageDataSaga from features nodes query', {
     capturedData,
   });
 
@@ -178,7 +179,7 @@ export function* homePageFeaturesDataSaga(_action) {
     }
   });
 
-  console.log('homePageDataSaga features nodes', {
+  log.debug('homePageDataSaga features nodes', {
     featureDestination,
     featureSources,
     highlightImages,
