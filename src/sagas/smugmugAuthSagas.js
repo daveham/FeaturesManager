@@ -10,6 +10,7 @@ import {
   SMUGMUG_REQUEST_TOKEN_URL,
   sortObjectProperties,
 } from 'shared/oauth';
+import log from 'shared/utilities/logger';
 import {
   readFromLocalStorage,
   writeToLocalStorage,
@@ -76,7 +77,7 @@ export function* smugmugGetRequestTokenSaga({
       yield call(writeToLocalStorage, 'smugmugApiKey', smugmugApiKey);
       yield call(writeToLocalStorage, 'smugmugApiSecret', smugmugApiSecret);
     } catch (e) {
-      console.error(
+      log.error(
         'exception writing to local storage in smugmugVerifyPinSaga',
         e,
       );
@@ -148,7 +149,7 @@ export function* smugmugVerifyPinSaga({ payload }) {
       yield call(writeToLocalStorage, 'authToken', authToken);
       yield call(writeToLocalStorage, 'authTokenSecret', authTokenSecret);
     } catch (e) {
-      console.error(
+      log.error(
         'exception writing to local storage in smugmugVerifyPinSaga',
         e,
       );
@@ -176,7 +177,7 @@ export function* smugmugLoadFromLocalStorageSaga() {
       ),
     );
   } catch (e) {
-    console.error('exception in smugmugVerifyPinSaga', e);
+    log.error('exception in smugmugVerifyPinSaga', e);
   }
 }
 

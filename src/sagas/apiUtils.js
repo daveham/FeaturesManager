@@ -8,6 +8,7 @@ import {
   SMUGMUG_API_ORIGIN,
   SMUGMUG_BASE_URL,
 } from 'shared/oauth';
+import log from 'shared/utilities/logger';
 import {
   smugmugAccessTokenSelector,
   smugmugConsumerCredentialsSelector,
@@ -120,7 +121,7 @@ export function* callApi(fn, args, options = {}) {
       }
     }
   } catch (apiSuccessErr) {
-    console.error('caught error dispatching success action', apiSuccessErr);
+    log.error('caught error dispatching success action', apiSuccessErr);
   }
   return true;
 }

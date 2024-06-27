@@ -4,6 +4,7 @@ import { Button, Portal, Text } from 'react-native-paper';
 import { useSelector } from 'react-redux';
 
 import usePrevious from 'shared/hooks/usePreviousHook';
+import log from 'shared/utilities/logger';
 import {
   smugmugAccessTokenSelector,
   smugmugAuthorizationUrlSelector,
@@ -34,7 +35,7 @@ export function Authentication(
   useEffect(() => {
     if (authorizationUrl && !previousAuthorizationUrl) {
       Linking.openURL(authorizationUrl).then(() => {
-        console.log(`opening URL ${authorizationUrl}`);
+        log.info(`opening URL ${authorizationUrl}`);
       });
     }
   }, [authorizationUrl, previousAuthorizationUrl]);
@@ -95,7 +96,7 @@ export function Authentication(
   };
 
   const handleCancelAuthenticationPress = () => {
-    console.log('Implement cancel here');
+    log.info('Implement cancel here');
   };
 
   const isAuthenticated = access_token && access_token_secret;
