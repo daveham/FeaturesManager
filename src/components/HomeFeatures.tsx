@@ -131,28 +131,6 @@ export function HomeFeatures(): React.JSX.Element {
 }
 /* eslint-enable react/no-unstable-nested-components */
 
-/*
-          {
-            sources.map(
-              (source: { key: string; name: string; highlightImage: any }) => (
-                <List.Item
-                  key={source.key}
-                  title={source.name}
-                  style={styles.listItem}
-                  left={() => (
-                    <FasterImageView
-                      style={styles.highlightImage}
-                      source={{
-                        borderRadius: 10,
-                        url: source.highlightImage.thumbnailUrl,
-                      }}
-                    />
-                  )}
-                />
-              ),
-            )}
-*/
-
 const CONTAINER_SPACING_UNIT = 20;
 const styles = StyleSheet.create({
   root: {
