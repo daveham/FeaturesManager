@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { StyleSheet, View } from 'react-native';
+import BootSplash from 'react-native-bootsplash';
 import { Portal, Snackbar } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
 import { NavigationContainer } from '@react-navigation/native';
@@ -31,7 +32,11 @@ function App(): React.JSX.Element {
 
   return (
     <View style={styles.root}>
-      <NavigationContainer theme={theme}>
+      <NavigationContainer
+        theme={theme}
+        onReady={() => {
+          BootSplash.hide();
+        }}>
         <AppDrawer />
       </NavigationContainer>
       <Portal>

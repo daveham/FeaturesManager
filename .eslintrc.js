@@ -5,7 +5,7 @@ module.exports = {
     ecmaVersion: 'latest',
   },
   plugins: ['import', 'simple-import-sort'],
-  extends: ['@react-native', 'prettier'],
+  extends: ['@react-native'],
   rules: {
     'react-hooks/exhaustive-deps': 'error',
     'simple-import-sort/imports': [
